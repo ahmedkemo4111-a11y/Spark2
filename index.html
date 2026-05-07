@@ -555,14 +555,12 @@ function renderCompanies(){
   const cos=_D?.companies?.companies||[];
   if(!cos.length){document.getElementById('page-content').innerHTML='<div class="empty-state" style="padding:60px">No companies yet.</div>';return;}
   let html='<div class="search-wrap"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="co-search" placeholder="Search companies..." oninput="filterCompanies()"/></div>'
-    +'<div class="full-panel"><table class="data-table" id="co-table"><thead><tr><th>Company</th><th>Industry</th><th>HQ</th><th>Headcount</th><th>SAP User</th><th>Prospects</th></tr></thead><tbody>';
+    +'<div class="full-panel"><table class="data-table" id="co-table"><thead><tr><th>Company</th><th>Industry</th><th>SAP User</th><th>Prospects</th></tr></thead><tbody>';
   cos.forEach(c=>{
     const sapBadge=c.sap_user==='Yes'?'<span class="badge badge-green">Yes</span>':c.sap_user==='No'?'<span class="badge badge-gray">No</span>':'<span class="badge badge-gray">-</span>';
     html+='<tr onclick="showPage(\'company\',\''+encodeURIComponent(c.name)+'\')">'
       +'<td><strong>'+c.name+'</strong></td>'
       +'<td>'+(clean(c.industry)||'-')+'</td>'
-      +'<td>'+(clean(c.headquarter)||'-')+'</td>'
-      +'<td>'+(clean(c.headcount)||'-')+'</td>'
       +'<td>'+sapBadge+'</td>'
       +'<td>'+(c.prospects||0)+'</td></tr>';
   });
