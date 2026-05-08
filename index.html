@@ -693,7 +693,9 @@ function buildProspectCards(prospects,companyName,isArchived){
         +'</div></div></div>';
 
       // Show saved note for this message if exists (parsed from overall notes)
-      const msgLabel='['+mb.label+']:';
+      // Match note using short label (strip parenthetical like "(BDC)")
+      const baseLabel=mb.label.indexOf(' (')>-1?mb.label.split(' (')[0]:mb.label;
+      const msgLabel='['+baseLabel+']:';
       const savedMsgNote=p.notes?p.notes.split('\n').filter(l=>l.startsWith(msgLabel)).map(l=>l.replace(msgLabel,'').trim()).join(' '):'';
       if(savedMsgNote){
         html+='<div style="margin:4px 0 8px 0;padding:8px 12px;background:var(--orange-light);border-radius:var(--radius-sm);font-size:12px;color:var(--orange);border-left:3px solid var(--orange)">Note: '+savedMsgNote+'</div>';
