@@ -652,6 +652,7 @@ function buildProspectCards(prospects,companyName,isArchived){
       +'<div class="prospect-status-row">'
       +(p.followUpDate?'<span class="badge '+(p.isOverdue?'badge-red':'badge-orange')+'">'+p.followUpDate+'</span>':'')
       +statusBadge(p.status)+priorityBadge(p.priority)+stepDots(p.currentStep)
+      +(isArchived?'<button class="copy-btn" style="margin-left:8px;color:var(--green);border-color:var(--green)" onclick="restoreProspect(\''+encodeURIComponent(p.name)+'\',\''+encodeURIComponent(companyName)+'\')">Restore</button>':'')
       +'</div></div>'
       +'<div class="prospect-messages">';
 
@@ -673,8 +674,8 @@ function buildProspectCards(prospects,companyName,isArchived){
         +(msg?'<button class="copy-btn" onclick="copyText(document.getElementById(\'mt-'+idx+'-'+mb.step+'\').innerText)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button>':'')
         +(!isDone&&!isArchived?'<button class="done-btn" id="cdb-'+idx+'-'+mb.step+'" onclick="markCompanyDone(\''+encodeURIComponent(p.name)+'\',\''+encodeURIComponent(companyName)+'\','+mb.step+',\''+idx+'\')">Mark as sent</button>':(isDone?'<span class="badge badge-green">Sent</span>':''))
         +'</div>'
-        // Outcome panel with notes INSIDE it
-        +'<div class="outcome-panel" id="cop-'+idx+'-'+mb.step+'">'
+        // Outcome panel with notes INSIDE it - auto-open if sent
+        +'<div class="outcome-panel '+(isDone?'open':'')+'" id="cop-'+idx+'-'+mb.step+'">'
         +'<div class="outcome-label">What was the outcome?</div>'
         +'<div class="outcome-options">'
         +'<button class="outcome-opt" onclick="selectCompanyOutcome(\''+idx+'\','+mb.step+',\'follow_up\',\''+encodeURIComponent(p.name)+'\',\''+encodeURIComponent(companyName)+'\')">Follow Up</button>'
@@ -682,6 +683,8 @@ function buildProspectCards(prospects,companyName,isArchived){
         +'<button class="outcome-opt" onclick="selectCompanyOutcome(\''+idx+'\','+mb.step+',\'not_interested\',\''+encodeURIComponent(p.name)+'\',\''+encodeURIComponent(companyName)+'\')">Not Interested</button>'
         +'</div>'
         +'<div id="cod-'+idx+'-'+mb.step+'"></div>'
+        // Pre-fill date picker if outcome already set
+        +(isDone&&t.outcome&&t.outcome!=='Not Interested'?'<div class="date-picker-row"><input type="date" id="cdp-'+idx+'-'+mb.step+'" /><button class="save-outcome-btn" onclick="saveCompanyOutcome(\''+idx+'\','+mb.step+',\''+encodeURIComponent(p.name)+'\',\''+encodeURIComponent(companyName)+'\',\'follow_up\')">Update</button></div>':'')
         // Notes directly below outcome in same panel
         +'<div class="notes-row" style="margin-top:10px">'
         +'<div class="outcome-label">Notes for this message</div>'
@@ -778,6 +781,20 @@ function saveCompanyOutcome(idx,step,ep,ec,type){
   if(!date){toast('Please pick a date');return;}
   apiWrite({action:'scheduleFollowUp',prospectName:decodeURIComponent(ep),companyName:decodeURIComponent(ec),date,step:step,type:type==='meeting'?'Meeting Scheduled':'Follow Up'}).then(res=>{
     if(res.success)toast('Scheduled for '+date);else toast(res.error||'Error');
+  });
+}
+
+function restoreProspect(ep,ec){
+  const pN=decodeURIComponent(ep);
+  const cN=decodeURIComponent(ec);
+  apiWrite({action:'restoreProspect',prospectName:pN,companyName:cN}).then(res=>{
+    if(res.success){
+      toast('Prospect restored to Active');
+      delete _CC[cN];
+      setTimeout(()=>loadCompany(encodeURIComponent(cN)),800);
+    }else{
+      toast('Error: '+(res.error||'Could not restore'));
+    }
   });
 }
 
