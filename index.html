@@ -784,6 +784,15 @@ function saveCompanyOutcome(idx,step,ep,ec,type){
   });
 }
 
+function restorePipelineProspect(ep,ec){
+  const pN=decodeURIComponent(ep);
+  const cN=decodeURIComponent(ec);
+  apiWrite({action:'restoreProspect',prospectName:pN,companyName:cN}).then(res=>{
+    if(res.success){toast('Prospect restored to Active');renderPipeline('archived');}
+    else toast('Error: '+(res.error||'Could not restore'));
+  });
+}
+
 function restoreProspect(ep,ec){
   const pN=decodeURIComponent(ep);
   const cN=decodeURIComponent(ec);
@@ -834,7 +843,7 @@ function renderPipeline(tab){
     +'</div>';
   if(!list.length)html+='<div class="empty-state" style="padding:60px">'+(_pipelineTab==='active'?'No active prospects.':'No archived prospects.')+'</div>';
   else{
-    html+='<div class="full-panel"><table class="data-table"><thead><tr><th>Prospect</th><th>Company</th><th>Title</th><th>Step</th><th>Follow Up</th><th>Status</th><th>Priority</th></tr></thead><tbody>';
+    html+='<div class="full-panel"><table class="data-table"><thead><tr><th>Prospect</th><th>Company</th><th>Title</th><th>Step</th><th>Follow Up</th><th>Status</th><th>Priority</th>'+(_pipelineTab==='archived'?'<th></th>':'')+'</tr></thead><tbody>';
     list.forEach(p=>{
       html+='<tr onclick="showPage(\'company\',\''+encodeURIComponent(p.company)+'\')">'
         +'<td><strong>'+p.name+'</strong></td>'
@@ -843,7 +852,9 @@ function renderPipeline(tab){
         +'<td>'+stepDots(p.currentStep)+'</td>'
         +'<td>'+(p.isOverdue?'<span class="badge badge-red">'+p.followUpDate+'</span>':p.followUpDate?'<span class="badge badge-orange">'+p.followUpDate+'</span>':'<span class="badge badge-gray">Not set</span>')+'</td>'
         +'<td>'+statusBadge(p.status)+'</td>'
-        +'<td>'+priorityBadge(p.priority)+'</td></tr>';
+        +'<td>'+priorityBadge(p.priority)+'</td>'
+        +(_pipelineTab==='archived'?'<td onclick="event.stopPropagation()"><button class="copy-btn" style="color:var(--green);border-color:var(--green);white-space:nowrap" onclick="restorePipelineProspect(\''+encodeURIComponent(p.name)+'\',\''+encodeURIComponent(p.company)+'\')">Restore</button></td>':'')
+        +'</tr>';
     });
     html+='</tbody></table></div>';
   }
