@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spark — SAP Outreach Platform</title>
+<title>Spark -- SAP Outreach Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -206,9 +206,187 @@ body.dark{--bg:#111110;--surface:#1c1c1a;--surface2:#252523;--border:#2e2e2b;--t
 .refresh-btn{font-size:11px;color:var(--text3);cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:20px;background:none;font-family:var(--font)}
 .refresh-btn:hover{color:var(--accent);border-color:var(--accent)}
 .cache-tag{font-size:10px;color:var(--text3);margin-left:8px}
+
+/* ============================================================
+   AUTH SCREENS
+   ============================================================ */
+.auth-screen{display:none;position:fixed;inset:0;background:var(--bg);z-index:1000;align-items:center;justify-content:center;}
+.auth-screen.active{display:flex;}
+.auth-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:40px;width:100%;max-width:420px;box-shadow:0 8px 32px rgba(0,0,0,0.08);}
+.auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:32px;}
+.auth-logo-icon{width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.auth-logo-icon svg{width:18px;height:18px;fill:white;}
+.auth-logo-name{font-size:20px;font-weight:700;color:var(--text);}
+.auth-logo-tag{font-size:11px;color:var(--text3);}
+.auth-title{font-size:22px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.auth-sub{font-size:13px;color:var(--text3);margin-bottom:28px;}
+.auth-field{margin-bottom:16px;}
+.auth-field label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;}
+.auth-input{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;background:var(--bg);color:var(--text);font-family:var(--font);transition:border-color 0.2s;}
+.auth-input:focus{outline:none;border-color:var(--accent);}
+.auth-btn{width:100%;padding:11px;background:var(--accent);color:white;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;font-family:var(--font);transition:opacity 0.2s;}
+.auth-btn:hover{opacity:0.88;}
+.auth-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.auth-switch{text-align:center;margin-top:20px;font-size:13px;color:var(--text3);}
+.auth-switch a{color:var(--accent);cursor:pointer;font-weight:500;}
+.auth-switch a:hover{text-decoration:underline;}
+.auth-error{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:16px;display:none;}
+.auth-error.show{display:block;}
+
+/* ONBOARDING */
+.onb-step{display:none;}
+.onb-step.active{display:block;}
+.onb-progress{display:flex;gap:6px;margin-bottom:28px;}
+.onb-dot{height:4px;flex:1;border-radius:2px;background:var(--border);transition:background 0.3s;}
+.onb-dot.done{background:var(--accent);}
+.onb-group{margin-bottom:20px;}
+.onb-group-label{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;}
+.onb-options{display:flex;flex-wrap:wrap;gap:8px;}
+.onb-opt{padding:7px 14px;border:1px solid var(--border);border-radius:20px;font-size:13px;cursor:pointer;background:var(--bg);color:var(--text2);transition:all 0.2s;user-select:none;}
+.onb-opt:hover{border-color:var(--accent);color:var(--accent);}
+.onb-opt.sel{background:var(--accent);border-color:var(--accent);color:white;}
+.onb-select{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;background:var(--bg);color:var(--text);font-family:var(--font);}
 </style>
 </head>
 <body>
+
+<!-- ============================================================
+     LOGIN SCREEN
+     ============================================================ -->
+<div class="auth-screen active" id="login-screen">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="auth-logo-icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+      <div><div class="auth-logo-name">Spark</div><div class="auth-logo-tag">SAP Outreach Platform</div></div>
+    </div>
+    <div class="auth-title">Welcome back</div>
+    <div class="auth-sub">Sign in to your Spark account</div>
+    <div class="auth-error" id="login-error"></div>
+    <div class="auth-field">
+      <label>Email address</label>
+      <input type="email" class="auth-input" id="login-email" placeholder="you@company.com" autocomplete="email"/>
+    </div>
+    <div class="auth-field">
+      <label>Password</label>
+      <input type="password" class="auth-input" id="login-password" placeholder="Your password" autocomplete="current-password"/>
+    </div>
+    <button class="auth-btn" id="login-btn" onclick="doLogin()">Sign in</button>
+    <div class="auth-switch">Don't have an account? <a onclick="showScreen('signup')">Sign up free</a></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SIGNUP SCREEN
+     ============================================================ -->
+<div class="auth-screen" id="signup-screen">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="auth-logo-icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+      <div><div class="auth-logo-name">Spark</div><div class="auth-logo-tag">SAP Outreach Platform</div></div>
+    </div>
+    <div class="auth-title">Create your account</div>
+    <div class="auth-sub">Start your free trial -- no credit card needed</div>
+    <div class="auth-error" id="signup-error"></div>
+    <div class="auth-field">
+      <label>Company name</label>
+      <input type="text" class="auth-input" id="signup-company" placeholder="Your company name"/>
+    </div>
+    <div class="auth-field">
+      <label>Email address</label>
+      <input type="email" class="auth-input" id="signup-email" placeholder="you@company.com" autocomplete="email"/>
+    </div>
+    <div class="auth-field">
+      <label>Password</label>
+      <input type="password" class="auth-input" id="signup-password" placeholder="Min. 6 characters" autocomplete="new-password"/>
+    </div>
+    <button class="auth-btn" id="signup-btn" onclick="doSignup()">Create account</button>
+    <div class="auth-switch">Already have an account? <a onclick="showScreen('login')">Sign in</a></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     ONBOARDING SCREEN
+     ============================================================ -->
+<div class="auth-screen" id="onboarding-screen">
+  <div class="auth-box" style="max-width:500px">
+    <div class="auth-logo">
+      <div class="auth-logo-icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+      <div><div class="auth-logo-name">Spark</div><div class="auth-logo-tag">Let's set up your account</div></div>
+    </div>
+    <div class="onb-progress">
+      <div class="onb-dot done" id="onb-dot-1"></div>
+      <div class="onb-dot" id="onb-dot-2"></div>
+      <div class="onb-dot" id="onb-dot-3"></div>
+    </div>
+
+    <!-- Step 1: Services -->
+    <div class="onb-step active" id="onb-step-1">
+      <div class="auth-title">What services do you offer?</div>
+      <div class="auth-sub">Select all that apply -- this shapes your outreach messages</div>
+      <div class="onb-group">
+        <div class="onb-options" id="services-opts">
+          <div class="onb-opt" onclick="toggleOpt(this,'services')">Implementation</div>
+          <div class="onb-opt" onclick="toggleOpt(this,'services')">Support</div>
+          <div class="onb-opt" onclick="toggleOpt(this,'services')">Migration</div>
+          <div class="onb-opt" onclick="toggleOpt(this,'services')">Customization</div>
+          <div class="onb-opt" onclick="toggleOpt(this,'services')">System Enhancement</div>
+          <div class="onb-opt" onclick="toggleOpt(this,'services')">Training</div>
+          <div class="onb-opt" onclick="toggleOpt(this,'services')">Consulting</div>
+        </div>
+      </div>
+      <button class="auth-btn" onclick="onbNext(2)">Continue</button>
+    </div>
+
+    <!-- Step 2: Focus & Licensing -->
+    <div class="onb-step" id="onb-step-2">
+      <div class="auth-title">Your focus & offering</div>
+      <div class="auth-sub">Help us personalize your messages further</div>
+      <div class="onb-group">
+        <div class="onb-group-label">Do you work with SAP users only?</div>
+        <div class="onb-options" id="saponly-opts">
+          <div class="onb-opt" onclick="selectSingle(this,'saponly')">SAP users only</div>
+          <div class="onb-opt" onclick="selectSingle(this,'saponly')">All ERP systems</div>
+          <div class="onb-opt" onclick="selectSingle(this,'saponly')">Both SAP and non-SAP</div>
+        </div>
+      </div>
+      <div class="onb-group">
+        <div class="onb-group-label">Do you offer SAP licensing?</div>
+        <div class="onb-options" id="licensing-opts">
+          <div class="onb-opt" onclick="selectSingle(this,'licensing')">Yes, we offer licensing</div>
+          <div class="onb-opt" onclick="selectSingle(this,'licensing')">No, services only</div>
+        </div>
+      </div>
+      <button class="auth-btn" onclick="onbNext(3)">Continue</button>
+    </div>
+
+    <!-- Step 3: Approach & Tone -->
+    <div class="onb-step" id="onb-step-3">
+      <div class="auth-title">Your outreach style</div>
+      <div class="auth-sub">How do you like to communicate with prospects?</div>
+      <div class="onb-group">
+        <div class="onb-group-label">Approach</div>
+        <div class="onb-options" id="approach-opts">
+          <div class="onb-opt" onclick="selectSingle(this,'approach')">Consultative</div>
+          <div class="onb-opt" onclick="selectSingle(this,'approach')">Value-led</div>
+          <div class="onb-opt" onclick="selectSingle(this,'approach')">Direct</div>
+          <div class="onb-opt" onclick="selectSingle(this,'approach')">Relationship-first</div>
+        </div>
+      </div>
+      <div class="onb-group">
+        <div class="onb-group-label">Tone preference</div>
+        <div class="onb-options" id="tone-opts">
+          <div class="onb-opt" onclick="selectSingle(this,'tone')">Professional</div>
+          <div class="onb-opt" onclick="selectSingle(this,'tone')">Friendly</div>
+          <div class="onb-opt" onclick="selectSingle(this,'tone')">Formal</div>
+          <div class="onb-opt" onclick="selectSingle(this,'tone')">Casual</div>
+        </div>
+      </div>
+      <button class="auth-btn" id="onb-finish-btn" onclick="doSaveProfile()">Finish setup -></button>
+    </div>
+  </div>
+</div>
+
+
 <aside class="sidebar">
   <div class="sidebar-logo">
     <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
@@ -252,12 +430,205 @@ body.dark{--bg:#111110;--surface:#1c1c1a;--surface2:#252523;--border:#2e2e2b;--t
 <div class="toast" id="toast"></div>
 
 <script>
-const API='https://script.google.com/macros/s/AKfycbwJXd8VS9F_NVSxuhva6JqJ398q9Jk9O419uitKAQW6yDkNcCAJkdJk4BKEKqg-aUQc-Q/exec';
-const IMGBB='78d076b6b3ce492b51f2219de8166a29';
+
+// ============================================================
+// AUTH STATE
+// ============================================================
+const API = 'https://script.google.com/macros/s/AKfycbwJXd8VS9F_NVSxuhva6JqJ398q9Jk9O419uitKAQW6yDkNcCAJkdJk4BKEKqg-aUQc-Q/exec';
+const IMGBB = '78d076b6b3ce492b51f2219de8166a29';
+
+let _userId = sessionStorage.getItem('spark_uid') || '';
+let _userProfile = JSON.parse(sessionStorage.getItem('spark_profile') || 'null');
+const _onbState = {services:[], saponly:'', licensing:'', approach:'', tone:''};
+
+function apiAuth(params) {
+  const url = API + '?' + Object.entries(params).map(([k,v]) => k + '=' + encodeURIComponent(v)).join('&');
+  return fetch(url).then(r => r.json());
+}
+
+// ============================================================
+// SCREEN MANAGEMENT
+// ============================================================
+function showScreen(name) {
+  document.querySelectorAll('.auth-screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(name + '-screen');
+  if (el) el.classList.add('active');
+}
+
+function showApp() {
+  document.querySelectorAll('.auth-screen').forEach(s => s.classList.remove('active'));
+  // Update sidebar user info
+  if (_userProfile) {
+    const initials = (_userProfile.companyName || 'U').substring(0,2).toUpperCase();
+    const nameEl = document.querySelector('.user-name');
+    const planEl = document.querySelector('.user-plan');
+    if (nameEl) nameEl.textContent = _userProfile.companyName || 'User';
+    if (planEl) planEl.textContent = (_userProfile.plan || 'trial') + ' plan';
+  }
+}
+
+// ============================================================
+// LOGIN
+// ============================================================
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value.trim();
+  const errEl = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
+  errEl.classList.remove('show');
+
+  if (!email || !password) { showAuthError('login', 'Please fill in all fields'); return; }
+
+  btn.disabled = true; btn.textContent = 'Signing in...';
+  try {
+    const res = await apiAuth({action:'login', email, password});
+    if (res.success) {
+      _userId = res.userId;
+      _userProfile = res;
+      sessionStorage.setItem('spark_uid', _userId);
+      sessionStorage.setItem('spark_profile', JSON.stringify(res));
+      if (res.needsOnboarding) {
+        showScreen('onboarding');
+      } else {
+        showApp();
+        loadAll().then(() => showPage('dashboard'));
+      }
+    } else {
+      showAuthError('login', res.error || 'Invalid email or password');
+    }
+  } catch(e) {
+    showAuthError('login', 'Connection error -- try again');
+  }
+  btn.disabled = false; btn.textContent = 'Sign in';
+}
+
+// ============================================================
+// SIGNUP
+// ============================================================
+async function doSignup() {
+  const company = document.getElementById('signup-company').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value.trim();
+  const btn = document.getElementById('signup-btn');
+
+  if (!company || !email || !password) { showAuthError('signup', 'Please fill in all fields'); return; }
+  if (password.length < 6) { showAuthError('signup', 'Password must be at least 6 characters'); return; }
+
+  btn.disabled = true; btn.textContent = 'Creating account...';
+  try {
+    const res = await apiAuth({action:'signup', email, password, companyName:company});
+    if (res.success) {
+      _userId = res.userId;
+      _userProfile = {userId:res.userId, companyName:company, email, plan:'trial'};
+      sessionStorage.setItem('spark_uid', _userId);
+      sessionStorage.setItem('spark_profile', JSON.stringify(_userProfile));
+      showScreen('onboarding');
+    } else {
+      showAuthError('signup', res.error || 'Could not create account');
+    }
+  } catch(e) {
+    showAuthError('signup', 'Connection error -- try again');
+  }
+  btn.disabled = false; btn.textContent = 'Create account';
+}
+
+function showAuthError(screen, msg) {
+  const el = document.getElementById(screen + '-error');
+  if (el) { el.textContent = msg; el.classList.add('show'); }
+}
+
+// ============================================================
+// ONBOARDING
+// ============================================================
+function toggleOpt(el, group) {
+  el.classList.toggle('sel');
+  _onbState[group] = Array.from(document.querySelectorAll('#' + group + '-opts .onb-opt.sel'))
+    .map(o => o.textContent).join(', ');
+}
+
+function selectSingle(el, group) {
+  document.querySelectorAll('#' + group + '-opts .onb-opt').forEach(o => o.classList.remove('sel'));
+  el.classList.add('sel');
+  _onbState[group] = el.textContent;
+}
+
+function onbNext(step) {
+  document.querySelectorAll('.onb-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('onb-step-' + step).classList.add('active');
+  // Update progress dots
+  for (let i = 1; i <= 3; i++) {
+    const dot = document.getElementById('onb-dot-' + i);
+    if (dot) dot.classList.toggle('done', i <= step);
+  }
+}
+
+async function doSaveProfile() {
+  const btn = document.getElementById('onb-finish-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  try {
+    const res = await apiAuth({
+      action:'saveProfile',
+      userId: _userId,
+      services: _onbState.services || '',
+      approach: _onbState.approach || 'Consultative',
+      tone: _onbState.tone || 'Professional',
+      sapOnly: _onbState.saponly || '',
+      licensing: _onbState.licensing || ''
+    });
+    if (res.success) {
+      // Update local profile
+      _userProfile = Object.assign(_userProfile || {}, _onbState);
+      sessionStorage.setItem('spark_profile', JSON.stringify(_userProfile));
+      showApp();
+      loadAll().then(() => showPage('dashboard'));
+    } else {
+      btn.disabled = false; btn.textContent = 'Finish setup ->';
+      alert(res.error || 'Could not save profile');
+    }
+  } catch(e) {
+    btn.disabled = false; btn.textContent = 'Finish setup ->';
+    alert('Connection error -- try again');
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('spark_uid');
+  sessionStorage.removeItem('spark_profile');
+  _userId = ''; _userProfile = null;
+  showScreen('login');
+}
+
+// ============================================================
+// ENTER KEY SUPPORT
+// ============================================================
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Enter') return;
+  const loginScreen = document.getElementById('login-screen');
+  const signupScreen = document.getElementById('signup-screen');
+  if (loginScreen && loginScreen.classList.contains('active')) doLogin();
+  else if (signupScreen && signupScreen.classList.contains('active')) doSignup();
+});
+
+// ============================================================
+// INIT -- check session or show login
+// ============================================================
+(function init() {
+  if (_userId && _userProfile) {
+    showApp();
+    loadAll().then(() => showPage('dashboard'));
+  } else {
+    showScreen('login');
+  }
+})();
+
+
+
+
 
 let _D=null, _CC={}, currentPage='dashboard', currentCompany=null, _pipelineTab='active';
 
 function apiRaw(params){
+  if(_userId&&!params.userId)params.userId=_userId;
   const url=API+'?'+Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
   return fetch(url).then(r=>r.json());
 }
@@ -971,8 +1342,7 @@ function uploadFile(file,resultId,type){
 }
 
 // INIT
-document.getElementById('page-content').innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:60vh;flex-direction:column;gap:12px"><div class="spinner" style="width:24px;height:24px;border-width:3px"></div><div style="font-size:13px;color:var(--text3)">Loading Spark...</div></div>';
-loadAll().then(()=>{showPage('dashboard');}).catch(()=>{document.getElementById('page-content').innerHTML='<div class="empty-state" style="padding:60px">Failed to connect. Check your API connection.</div>';});
+// Init handled by auth system above
 </script>
 </body>
 </html>
