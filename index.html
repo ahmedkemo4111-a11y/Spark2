@@ -169,10 +169,19 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .upload-zone-icon{width:48px;height:48px;background:var(--surface2);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
 .upload-zone h3{font-size:15px;font-weight:600;margin-bottom:6px}
 .upload-zone p{font-size:13px;color:var(--text3)}
-.upload-result{margin-top:14px;padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;font-weight:500}
+.upload-result{margin-top:14px;padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;line-height:1.5}
 .upload-result.success{background:var(--green-light);color:var(--green)}
 .upload-result.error{background:var(--red-light);color:var(--red)}
 .upload-result.loading{background:var(--accent-light);color:var(--accent)}
+/* Upload progress steps */
+.upload-steps{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.upload-step{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text3)}
+.upload-step.active{color:var(--accent);font-weight:500}
+.upload-step.done{color:var(--green)}
+.upload-step-dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0}
+.upload-step.active .upload-step-dot{background:var(--accent);animation:pulse .8s ease infinite alternate}
+.upload-step.done .upload-step-dot{background:var(--green)}
+@keyframes pulse{from{opacity:.4}to{opacity:1}}
 .analytics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
 .chart-bar-container{padding:16px 20px}
 .chart-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
@@ -191,7 +200,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:white;padding:12px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;z-index:9999;display:none}
 .toast.show{display:block;animation:toastIn .3s ease}
 @keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-/* Skeleton loading */
 .skeleton{background:linear-gradient(90deg,var(--surface2) 25%,var(--border) 50%,var(--surface2) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:6px}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .skeleton-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:12px}
@@ -203,13 +211,8 @@ body.dark{--bg:#111110;--surface:#1c1c1a;--surface2:#252523;--border:#2e2e2b;--t
 .full-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
 .spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.refresh-btn{font-size:11px;color:var(--text3);cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:20px;background:none;font-family:var(--font)}
-.refresh-btn:hover{color:var(--accent);border-color:var(--accent)}
-.cache-tag{font-size:10px;color:var(--text3);margin-left:8px}
 
-/* ============================================================
-   AUTH SCREENS
-   ============================================================ */
+/* AUTH SCREENS */
 .auth-screen{display:none;position:fixed;inset:0;background:var(--bg);z-index:1000;align-items:center;justify-content:center;}
 .auth-screen.active{display:flex;}
 .auth-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:40px;width:100%;max-width:420px;box-shadow:0 8px 32px rgba(0,0,0,0.08);}
@@ -245,14 +248,11 @@ body.dark{--bg:#111110;--surface:#1c1c1a;--surface2:#252523;--border:#2e2e2b;--t
 .onb-opt{padding:7px 14px;border:1px solid var(--border);border-radius:20px;font-size:13px;cursor:pointer;background:var(--bg);color:var(--text2);transition:all 0.2s;user-select:none;}
 .onb-opt:hover{border-color:var(--accent);color:var(--accent);}
 .onb-opt.sel{background:var(--accent);border-color:var(--accent);color:white;}
-.onb-select{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;background:var(--bg);color:var(--text);font-family:var(--font);}
 </style>
 </head>
 <body>
 
-<!-- ============================================================
-     LOGIN SCREEN
-     ============================================================ -->
+<!-- LOGIN -->
 <div class="auth-screen active" id="login-screen">
   <div class="auth-box">
     <div class="auth-logo">
@@ -262,22 +262,14 @@ body.dark{--bg:#111110;--surface:#1c1c1a;--surface2:#252523;--border:#2e2e2b;--t
     <div class="auth-title">Welcome back</div>
     <div class="auth-sub">Sign in to your Spark account</div>
     <div class="auth-error" id="login-error"></div>
-    <div class="auth-field">
-      <label>Email address</label>
-      <input type="email" class="auth-input" id="login-email" placeholder="you@company.com" autocomplete="email"/>
-    </div>
-    <div class="auth-field">
-      <label>Password</label>
-      <input type="password" class="auth-input" id="login-password" placeholder="Your password" autocomplete="current-password"/>
-    </div>
+    <div class="auth-field"><label>Email address</label><input type="email" class="auth-input" id="login-email" placeholder="you@company.com" autocomplete="email"/></div>
+    <div class="auth-field"><label>Password</label><input type="password" class="auth-input" id="login-password" placeholder="Your password" autocomplete="current-password"/></div>
     <button class="auth-btn" id="login-btn" onclick="doLogin()">Sign in</button>
     <div class="auth-switch">Don't have an account? <a onclick="showScreen('signup')">Sign up free</a></div>
   </div>
 </div>
 
-<!-- ============================================================
-     SIGNUP SCREEN
-     ============================================================ -->
+<!-- SIGNUP -->
 <div class="auth-screen" id="signup-screen">
   <div class="auth-box">
     <div class="auth-logo">
@@ -287,26 +279,15 @@ body.dark{--bg:#111110;--surface:#1c1c1a;--surface2:#252523;--border:#2e2e2b;--t
     <div class="auth-title">Create your account</div>
     <div class="auth-sub">Start your free trial -- no credit card needed</div>
     <div class="auth-error" id="signup-error"></div>
-    <div class="auth-field">
-      <label>Company name</label>
-      <input type="text" class="auth-input" id="signup-company" placeholder="Your company name"/>
-    </div>
-    <div class="auth-field">
-      <label>Email address</label>
-      <input type="email" class="auth-input" id="signup-email" placeholder="you@company.com" autocomplete="email"/>
-    </div>
-    <div class="auth-field">
-      <label>Password</label>
-      <input type="password" class="auth-input" id="signup-password" placeholder="Min. 6 characters" autocomplete="new-password"/>
-    </div>
+    <div class="auth-field"><label>Company name</label><input type="text" class="auth-input" id="signup-company" placeholder="Your company name"/></div>
+    <div class="auth-field"><label>Email address</label><input type="email" class="auth-input" id="signup-email" placeholder="you@company.com" autocomplete="email"/></div>
+    <div class="auth-field"><label>Password</label><input type="password" class="auth-input" id="signup-password" placeholder="Min. 6 characters" autocomplete="new-password"/></div>
     <button class="auth-btn" id="signup-btn" onclick="doSignup()">Create account</button>
     <div class="auth-switch">Already have an account? <a onclick="showScreen('login')">Sign in</a></div>
   </div>
 </div>
 
-<!-- ============================================================
-     ONBOARDING SCREEN
-     ============================================================ -->
+<!-- ONBOARDING -->
 <div class="auth-screen" id="onboarding-screen">
   <div class="auth-box" style="max-width:520px;max-height:90vh;overflow-y:auto">
     <div class="auth-logo">
@@ -414,7 +395,6 @@ body.dark{--bg:#111110;--surface:#1c1c1a;--surface2:#252523;--border:#2e2e2b;--t
   </div>
 </div>
 
-
 <aside class="sidebar">
   <div class="sidebar-logo">
     <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
@@ -439,8 +419,8 @@ body.dark{--bg:#111110;--surface:#1c1c1a;--surface2:#252523;--border:#2e2e2b;--t
     </div>
   </nav>
   <div class="sidebar-user">
-    <div class="user-avatar">AH</div>
-    <div class="user-info"><div class="user-name">Ahmed H.</div><div class="user-plan">Pro Plan</div></div>
+    <div class="user-avatar" id="sidebar-avatar">S</div>
+    <div class="user-info"><div class="user-name" id="sidebar-name">Loading...</div><div class="user-plan" id="sidebar-plan">trial plan</div></div>
     <button class="theme-btn" onclick="toggleTheme()"><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
     <button class="theme-btn" title="Logout" onclick="doLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
   </div>
@@ -459,10 +439,6 @@ body.dark{--bg:#111110;--surface:#1c1c1a;--surface2:#252523;--border:#2e2e2b;--t
 <div class="toast" id="toast"></div>
 
 <script>
-
-// ============================================================
-// AUTH STATE
-// ============================================================
 const API = 'https://script.google.com/macros/s/AKfycbwJXd8VS9F_NVSxuhva6JqJ398q9Jk9O419uitKAQW6yDkNcCAJkdJk4BKEKqg-aUQc-Q/exec';
 const IMGBB = '78d076b6b3ce492b51f2219de8166a29';
 
@@ -475,9 +451,6 @@ function apiAuth(params) {
   return fetch(url).then(r => r.json());
 }
 
-// ============================================================
-// SCREEN MANAGEMENT
-// ============================================================
 function showScreen(name) {
   document.querySelectorAll('.auth-screen').forEach(s => s.classList.remove('active'));
   const el = document.getElementById(name + '-screen');
@@ -489,27 +462,21 @@ function showApp() {
   if (_userProfile) {
     const name = _userProfile.companyName || 'User';
     const initials = name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-    const avatarEl = document.querySelector('.user-avatar');
-    const nameEl = document.querySelector('.user-name');
-    const planEl = document.querySelector('.user-plan');
+    const avatarEl = document.getElementById('sidebar-avatar');
+    const nameEl = document.getElementById('sidebar-name');
+    const planEl = document.getElementById('sidebar-plan');
     if (avatarEl) avatarEl.textContent = initials;
     if (nameEl) nameEl.textContent = name;
     if (planEl) planEl.textContent = (_userProfile.plan || 'trial') + ' plan';
   }
 }
 
-// ============================================================
-// LOGIN
-// ============================================================
 async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value.trim();
-  const errEl = document.getElementById('login-error');
   const btn = document.getElementById('login-btn');
-  errEl.classList.remove('show');
-
+  document.getElementById('login-error').classList.remove('show');
   if (!email || !password) { showAuthError('login', 'Please fill in all fields'); return; }
-
   btn.disabled = true; btn.textContent = 'Signing in...';
   try {
     const res = await apiAuth({action:'login', email, password});
@@ -518,33 +485,20 @@ async function doLogin() {
       _userProfile = res;
       sessionStorage.setItem('spark_uid', _userId);
       sessionStorage.setItem('spark_profile', JSON.stringify(res));
-      if (res.needsOnboarding) {
-        showScreen('onboarding');
-      } else {
-        showApp();
-        loadAll().then(() => showPage('dashboard'));
-      }
-    } else {
-      showAuthError('login', res.error || 'Invalid email or password');
-    }
-  } catch(e) {
-    showAuthError('login', 'Connection error -- try again');
-  }
+      if (res.needsOnboarding) { showScreen('onboarding'); }
+      else { showApp(); loadAll().then(() => showPage('dashboard')); }
+    } else { showAuthError('login', res.error || 'Invalid email or password'); }
+  } catch(e) { showAuthError('login', 'Connection error -- try again'); }
   btn.disabled = false; btn.textContent = 'Sign in';
 }
 
-// ============================================================
-// SIGNUP
-// ============================================================
 async function doSignup() {
   const company = document.getElementById('signup-company').value.trim();
   const email = document.getElementById('signup-email').value.trim();
   const password = document.getElementById('signup-password').value.trim();
   const btn = document.getElementById('signup-btn');
-
   if (!company || !email || !password) { showAuthError('signup', 'Please fill in all fields'); return; }
   if (password.length < 6) { showAuthError('signup', 'Password must be at least 6 characters'); return; }
-
   btn.disabled = true; btn.textContent = 'Creating account...';
   try {
     const res = await apiAuth({action:'signup', email, password, companyName:company});
@@ -554,12 +508,8 @@ async function doSignup() {
       sessionStorage.setItem('spark_uid', _userId);
       sessionStorage.setItem('spark_profile', JSON.stringify(_userProfile));
       showScreen('onboarding');
-    } else {
-      showAuthError('signup', res.error || 'Could not create account');
-    }
-  } catch(e) {
-    showAuthError('signup', 'Connection error -- try again');
-  }
+    } else { showAuthError('signup', res.error || 'Could not create account'); }
+  } catch(e) { showAuthError('signup', 'Connection error -- try again'); }
   btn.disabled = false; btn.textContent = 'Create account';
 }
 
@@ -568,13 +518,9 @@ function showAuthError(screen, msg) {
   if (el) { el.textContent = msg; el.classList.add('show'); }
 }
 
-// ============================================================
-// ONBOARDING
-// ============================================================
 function toggleOpt(el, group) {
   el.classList.toggle('sel');
-  _onbState[group] = Array.from(document.querySelectorAll('#' + group + '-opts .onb-opt.sel'))
-    .map(o => o.textContent).join(', ');
+  _onbState[group] = Array.from(document.querySelectorAll('#' + group + '-opts .onb-opt.sel')).map(o => o.textContent).join(', ');
 }
 
 function selectSingle(el, group) {
@@ -596,41 +542,26 @@ async function doSaveProfile() {
   const btn = document.getElementById('onb-finish-btn');
   btn.disabled = true; btn.textContent = 'Saving...';
   try {
-    const companyDesc = document.getElementById('company-desc')?.value||'';
+    const companyDesc = document.getElementById('company-desc')?.value || '';
     const res = await apiAuth({
-      action:'saveProfile',
-      userId: _userId,
-      services: _onbState.services || '',
-      companyDescription: companyDesc,
-      accelerators: _onbState.accelerators || '',
-      valueProp: _onbState.valueprop || '',
-      sapOnly: _onbState.saponly || '',
-      licensing: _onbState.licensing || '',
-      approach: _onbState.approach || 'Consultative',
-      tone: _onbState.tone || 'Professional'
+      action:'saveProfile', userId:_userId,
+      services:_onbState.services||'', companyDescription:companyDesc,
+      accelerators:_onbState.accelerators||'', valueProp:_onbState.valueprop||'',
+      sapOnly:_onbState.saponly||'', licensing:_onbState.licensing||'',
+      approach:_onbState.approach||'Consultative', tone:_onbState.tone||'Professional'
     });
     if (res.success) {
       _userProfile = Object.assign(_userProfile||{}, {
-        services:_onbState.services,
-        companyDescription:companyDesc,
-        accelerators:_onbState.accelerators,
-        valueProp:_onbState.valueprop,
-        sapOnly:_onbState.saponly,
-        licensing:_onbState.licensing,
-        approach:_onbState.approach,
-        tone:_onbState.tone
+        services:_onbState.services, companyDescription:companyDesc,
+        accelerators:_onbState.accelerators, valueProp:_onbState.valueprop,
+        sapOnly:_onbState.saponly, licensing:_onbState.licensing,
+        approach:_onbState.approach, tone:_onbState.tone
       });
       sessionStorage.setItem('spark_profile', JSON.stringify(_userProfile));
       showApp();
       loadAll().then(() => showPage('dashboard'));
-    } else {
-      btn.disabled = false; btn.textContent = 'Finish setup ->';
-      alert(res.error || 'Could not save profile');
-    }
-  } catch(e) {
-    btn.disabled = false; btn.textContent = 'Finish setup ->';
-    alert('Connection error -- try again');
-  }
+    } else { btn.disabled = false; btn.textContent = 'Finish setup ->'; alert(res.error || 'Could not save profile'); }
+  } catch(e) { btn.disabled = false; btn.textContent = 'Finish setup ->'; alert('Connection error -- try again'); }
 }
 
 function doLogout() {
@@ -640,9 +571,6 @@ function doLogout() {
   showScreen('login');
 }
 
-// ============================================================
-// ENTER KEY SUPPORT
-// ============================================================
 document.addEventListener('keydown', function(e) {
   if (e.key !== 'Enter') return;
   const loginScreen = document.getElementById('login-screen');
@@ -651,37 +579,23 @@ document.addEventListener('keydown', function(e) {
   else if (signupScreen && signupScreen.classList.contains('active')) doSignup();
 });
 
-// ============================================================
-// INIT -- check session or show login
-// ============================================================
 (function init() {
-  if (_userId && _userProfile) {
-    showApp();
-    loadAll().then(() => showPage('dashboard'));
-  } else {
-    showScreen('login');
-  }
+  if (_userId && _userProfile) { showApp(); loadAll().then(() => showPage('dashboard')); }
+  else { showScreen('login'); }
 })();
 
-
-
-
-
+// ============================================================
+// APP STATE
+// ============================================================
 let _D=null, _CC={}, currentPage='dashboard', currentCompany=null, _pipelineTab='active';
 
 function apiRaw(params){
-  if(_userId&&!params.userId)params.userId=_userId;
+  if(_userId&&!params.userId) params.userId=_userId;
   const url=API+'?'+Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
   return fetch(url).then(r=>r.json());
 }
 function loadAll(){return apiRaw({action:'all'}).then(data=>{_D=data;return data;});}
-
-// Fire and forget write - no waiting for reload
-function apiWrite(params){
-  const result=apiRaw(params);
-  result.then(()=>loadAll().catch(()=>{}));
-  return result;
-}
+function apiWrite(params){const result=apiRaw(params);result.then(()=>loadAll().catch(()=>{}));return result;}
 
 function toast(msg,dur=3000){
   const el=document.getElementById('toast');
@@ -693,19 +607,18 @@ function toggleTheme(){document.body.classList.toggle('dark');}
 function toggleMsg(id){document.getElementById(id)?.classList.toggle('expanded');}
 function stepDots(s){
   let h='<div class="step-progress">';
-  for(let i=1;i<=5;i++)h+='<div class="step-dot '+(i<s?'done':i===s?'current':'')+'"></div>';
+  for(let i=1;i<=5;i++) h+='<div class="step-dot '+(i<s?'done':i===s?'current':'')+'"></div>';
   return h+'</div>';
 }
 function priorityBadge(p){
-  if(!p)return'';
+  if(!p) return '';
   return '<span class="badge '+(p==='High'?'badge-red':p==='Medium'?'badge-orange':'badge-gray')+'">'+p+'</span>';
 }
 function statusBadge(s){
-  if(!s)return'';
+  if(!s) return '';
   const m={'Active':'badge-green','Follow Up Scheduled':'badge-orange','Meeting':'badge-purple','Not Interested':'badge-red','Paused':'badge-gray','Responded':'badge-purple','Converted':'badge-green'};
   return '<span class="badge '+(m[s]||'badge-gray')+'">'+s+'</span>';
 }
-function esc(s){return String(s||'').replace(/"/g,'""');}
 function clean(s){const v=String(s||'');return(v===''||v==='Not found'||v==='Not available'||v==='undefined')?'':v;}
 function skeletonCards(n){
   return Array(n||3).fill(0).map(()=>'<div class="skeleton-card"><div class="skeleton sk-line sk-title"></div><div class="skeleton sk-line sk-med"></div><div class="skeleton sk-line sk-short"></div></div>').join('');
@@ -716,114 +629,58 @@ function showPage(page,extra){
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
   const nm={dashboard:0,tasks:1,companies:2,pipeline:3,analytics:4,activity:5,upload:6};
   const items=document.querySelectorAll('.nav-item');
-  if(nm[page]!==undefined&&items[nm[page]])items[nm[page]].classList.add('active');
+  if(nm[page]!==undefined&&items[nm[page]]) items[nm[page]].classList.add('active');
   const titles={dashboard:'Dashboard',tasks:'Tasks',companies:'Companies',pipeline:'Pipeline',analytics:'Analytics',activity:'Activity Log',upload:'Upload',company:'Company Detail'};
   document.getElementById('topbar-title').textContent=titles[page]||page;
   document.getElementById('topbar-sub').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   if(page==='upload'){loadUpload();return;}
   document.getElementById('page-content').innerHTML=skeletonCards(page==='dashboard'?2:4);
-  if(_D)renderPage(page,extra);
+  if(_D) renderPage(page,extra);
 }
 function renderPage(page,extra){
-  if(page==='dashboard')renderDashboard();
-  else if(page==='tasks')renderTasks();
-  else if(page==='companies')renderCompanies();
-  else if(page==='company')loadCompany(extra);
-  else if(page==='pipeline')renderPipeline();
-  else if(page==='analytics')renderAnalytics();
-  else if(page==='activity')renderActivity();
+  if(page==='dashboard') renderDashboard();
+  else if(page==='tasks') renderTasks();
+  else if(page==='companies') renderCompanies();
+  else if(page==='company') loadCompany(extra);
+  else if(page==='pipeline') renderPipeline();
+  else if(page==='analytics') renderAnalytics();
+  else if(page==='activity') renderActivity();
 }
 
-// EXPORT - proper multi-sheet XLS using data URIs
+// EXPORT
 function downloadExcel(){
   if(!_D){toast('Data not loaded yet');return;}
   const cos=_D.companies?.companies||[];
   const pros=_D.pipeline?.prospects||[];
   const acts=_D.activity?.activity||[];
-  const ac='#5B4FFF',gn='#16A34A',rd='#DC2626',or='#EA580C',gr='#6B6860';
-  const hs='background:'+ac+';color:white;font-weight:bold;padding:8px 12px;font-family:Arial;font-size:11px;border:1px solid #4a3fee;white-space:nowrap';
-  const cs='padding:7px 12px;font-family:Arial;font-size:10px;border:1px solid #e2e0d8;vertical-align:top';
-  const cb='padding:7px 12px;font-family:Arial;font-size:10px;border:1px solid #e2e0d8;font-weight:bold;vertical-align:top';
-  const ab='background:#f0efe9';
-  function sc(s){return s==='Active'?gn:s==='Not Interested'?rd:(s==='Follow Up Scheduled'||s==='Meeting')?or:gr;}
-
-  function makeTable(headers,rows){
-    let t='<table border="0" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;margin-bottom:28px"><tr>';
-    headers.forEach(h=>{t+='<th style="'+hs+'">'+h+'</th>';});
-    t+='</tr>';
-    rows.forEach((row,i)=>{
-      t+='<tr style="'+(i%2===0?'background:white':ab)+'">';
-      row.forEach((cell,ci)=>{t+='<td style="'+(ci===0?cb:cs)+'">'+cell+'</td>';});
-      t+='</tr>';
+  function makeSheet(name,headers,rows){
+    let s='<Worksheet ss:Name="'+name+'"><Table>';
+    s+='<Row>';
+    headers.forEach(h=>{s+='<Cell ss:StyleID="H"><Data ss:Type="String">'+h+'</Data></Cell>';});
+    s+='</Row>';
+    rows.forEach((row,ri)=>{
+      s+='<Row ss:StyleID="'+(ri%2===1?'A':'')+'">';
+      row.forEach((cell,ci)=>{s+='<Cell'+(ci===0?' ss:StyleID="B"':'')+'><Data ss:Type="String">'+String(cell).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</Data></Cell>';});
+      s+='</Row>';
     });
-    return t+'</table>';
+    return s+'</Table></Worksheet>';
   }
-
-  const coHeaders=['Company','Industry','HQ','Headcount','SAP User','SAP Solutions','Overview','Prospects'];
-  const coRows=cos.map(c=>[
-    c.name||'',clean(c.industry)||'-',clean(c.headquarter)||'-',clean(c.headcount)||'-',
-    '<span style="color:'+(c.sap_user==='Yes'?gn:gr)+';font-weight:bold">'+(c.sap_user||'-')+'</span>',
-    clean(c.sap_solutions)||'-',clean(c.overview)||'-',c.prospects||0
-  ]);
-
-  const prHeaders=['Prospect','Company','Title','Email','Phone','Status','Priority','Step','Follow Up'];
-  const prRows=pros.map(p=>[
-    p.name||'',p.company||'',(p.title||'').split('|')[0].trim(),
-    p.email||'-',p.phone||'-',
-    '<span style="color:'+sc(p.status)+';font-weight:bold">'+(p.status||'')+'</span>',
-    '<span style="color:'+(p.priority==='High'?rd:p.priority==='Medium'?or:gr)+';font-weight:bold">'+(p.priority||'')+'</span>',
-    (p.currentStep||1)+'/5',p.followUpDate||'-'
-  ]);
-
-  const acHeaders=['Date','Prospect','Company','Attempt','Type','Outcome'];
-  const acRows=acts.map(a=>[a.date||'',a.prospect||'',a.company||'',a.attempt||'',a.type||'',a.outcome||'-']);
-
-  const date=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-  const titleStyle='font-family:Arial;font-size:15px;font-weight:bold;color:'+ac+';margin:24px 0 10px 0';
-
-  // Use Excel XML format for proper multi-sheet support
   const xml='<?xml version="1.0"?><?mso-application progid="Excel.Sheet"?>'
     +'<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">'
     +'<Styles><Style ss:ID="H"><Font ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#5B4FFF" ss:Pattern="Solid"/></Style>'
     +'<Style ss:ID="A"><Interior ss:Color="#F0EFE9" ss:Pattern="Solid"/></Style>'
     +'<Style ss:ID="B"><Font ss:Bold="1"/></Style></Styles>'
-    +makeSheet('Companies',coHeaders,cos.map(c=>[
-      c.name||'',clean(c.industry)||'',clean(c.headquarter)||'',clean(c.headcount)||'',
-      c.sap_user||'',clean(c.sap_solutions)||'',clean(c.overview)||'',String(c.prospects||0)
-    ]))
-    +makeSheet('Prospects',prHeaders,pros.map(p=>[
-      p.name||'',p.company||'',(p.title||'').split('|')[0].trim(),
-      p.email||'',p.phone||'',p.status||'',p.priority||'',
-      (p.currentStep||1)+'/5',p.followUpDate||''
-    ]))
-    +makeSheet('Activity',acHeaders,acts.map(a=>[
-      a.date||'',a.prospect||'',a.company||'',String(a.attempt||''),a.type||'',a.outcome||''
-    ]))
+    +makeSheet('Companies',['Company','Industry','HQ','Headcount','SAP User','SAP Solutions','Overview','Prospects'],
+      cos.map(c=>[c.name||'',clean(c.industry)||'',clean(c.headquarter)||'',clean(c.headcount)||'',c.sap_user||'',clean(c.sap_solutions)||'',clean(c.overview)||'',String(c.prospects||0)]))
+    +makeSheet('Prospects',['Prospect','Company','Title','Email','Phone','Status','Priority','Step','Follow Up'],
+      pros.map(p=>[p.name||'',p.company||'',(p.title||'').split('|')[0].trim(),p.email||'',p.phone||'',p.status||'',p.priority||'',(p.currentStep||1)+'/5',p.followUpDate||'']))
+    +makeSheet('Activity',['Date','Prospect','Company','Attempt','Type','Outcome'],
+      acts.map(a=>[a.date||'',a.prospect||'',a.company||'',String(a.attempt||''),a.type||'',a.outcome||'']))
     +'</Workbook>';
-
   const blob=new Blob([xml],{type:'application/vnd.ms-excel;charset=utf-8'});
   const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download='spark_export_'+new Date().toISOString().slice(0,10)+'.xls';
-  a.click();
-  URL.revokeObjectURL(url);
-  toast('Export downloaded - 3 sheets');
-}
-
-function makeSheet(name,headers,rows){
-  let s='<Worksheet ss:Name="'+name+'"><Table>';
-  s+='<Row>';
-  headers.forEach(h=>{s+='<Cell ss:StyleID="H"><Data ss:Type="String">'+h+'</Data></Cell>';});
-  s+='</Row>';
-  rows.forEach((row,ri)=>{
-    s+='<Row ss:StyleID="'+(ri%2===1?'A':'')+'">';
-    row.forEach((cell,ci)=>{
-      s+='<Cell'+(ci===0?' ss:StyleID="B"':'')+'><Data ss:Type="String">'+String(cell).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</Data></Cell>';
-    });
-    s+='</Row>';
-  });
-  return s+'</Table></Worksheet>';
+  const a=document.createElement('a');a.href=url;a.download='spark_export_'+new Date().toISOString().slice(0,10)+'.xls';a.click();
+  URL.revokeObjectURL(url);toast('Export downloaded - 3 sheets');
 }
 
 // DASHBOARD
@@ -837,7 +694,7 @@ function renderDashboard(){
     +'<div class="metric-card"><div class="metric-label">Tasks Due</div><div class="metric-value">'+(m.followUpsDue||0)+'</div><span class="metric-sub '+(m.followUpsDue>0?'orange':'')+'">'+(m.followUpsDue>0?m.followUpsDue+' need attention':'all clear')+'</span></div>'
     +'</div><div class="panels-grid">'
     +'<div class="panel"><div class="panel-header"><span class="panel-title">Recent companies</span><span class="panel-link" onclick="showPage(\'companies\')">View all</span></div><div class="panel-body">';
-  if(!data.recentCompanies?.length)html+='<div class="empty-state">No companies yet</div>';
+  if(!data.recentCompanies?.length) html+='<div class="empty-state">No companies yet</div>';
   else data.recentCompanies.forEach(c=>{
     const meta=[c.industry,c.headquarter,c.headcount].filter(v=>v&&v!=='Not found').join(' - ');
     html+='<div class="company-item" onclick="showPage(\'company\',\''+encodeURIComponent(c.name)+'\')">'
@@ -845,14 +702,14 @@ function renderDashboard(){
       +'<div style="display:flex;gap:6px;align-items:center">'+(c.sap_user==='Yes'?'<span class="badge badge-green">SAP</span>':'')+'<span class="badge badge-gray">'+(c.prospects||0)+'</span></div></div>';
   });
   html+='</div></div><div class="panel"><div class="panel-header"><span class="panel-title">Tasks due today</span><span class="panel-link" onclick="showPage(\'tasks\')">View all</span></div><div class="panel-body">';
-  if(!data.dueTodayProspects?.length)html+='<div class="empty-state">No tasks due today</div>';
+  if(!data.dueTodayProspects?.length) html+='<div class="empty-state">No tasks due today</div>';
   else data.dueTodayProspects.slice(0,5).forEach(p=>{
     html+='<div class="company-item" onclick="showPage(\'tasks\')">'
       +'<div><div class="company-name">'+p.name+'</div><div class="company-meta">'+p.company+' - Step '+p.step+'</div></div>'
       +priorityBadge(p.priority)+'</div>';
   });
   html+='</div></div></div><div class="panel"><div class="panel-header"><span class="panel-title">Recent activity</span><span class="panel-link" onclick="showPage(\'activity\')">View all</span></div><div class="panel-body">';
-  if(!data.recentActivity?.length)html+='<div class="empty-state">No activity yet</div>';
+  if(!data.recentActivity?.length) html+='<div class="empty-state">No activity yet</div>';
   else{
     html+='<table class="data-table"><thead><tr><th>Date</th><th>Prospect</th><th>Company</th><th>Type</th><th>Outcome</th></tr></thead><tbody>';
     data.recentActivity.forEach(a=>{html+='<tr><td>'+(a.date||'')+'</td><td>'+(a.prospect||'')+'</td><td>'+(a.company||'')+'</td><td>'+(a.type||'')+'</td><td>'+(a.outcome||'-')+'</td></tr>';});
@@ -895,10 +752,9 @@ function renderTasks(){
       +'<button class="outcome-opt" onclick="selectTaskOutcome('+ti+',\'follow_up\')">Follow Up</button>'
       +'<button class="outcome-opt" onclick="selectTaskOutcome('+ti+',\'meeting\')">Meeting Scheduled</button>'
       +'<button class="outcome-opt" onclick="selectTaskOutcome('+ti+',\'not_interested\')">Not Interested</button>'
-      +'</div>'
-      +'<div id="od-'+ti+'"></div>'
+      +'</div><div id="od-'+ti+'"></div>'
       +'<div class="notes-row"><div class="outcome-label" style="margin-top:8px">Notes</div>'
-      +'<textarea class="notes-input" id="ni-'+ti+'" rows="2" placeholder="Add notes...">'+( t.notes||'')+'</textarea>'
+      +'<textarea class="notes-input" id="ni-'+ti+'" rows="2" placeholder="Add notes...">'+(t.notes||'')+'</textarea>'
       +'<button class="save-notes-btn" onclick="saveTaskNotes('+ti+',\''+encodeURIComponent(t.prospectName)+'\',\''+encodeURIComponent(t.company)+'\')">Save notes</button>'
       +'</div></div></div>';
   });
@@ -910,17 +766,12 @@ function markTaskDone(ti,ep,ec,step){
   const btn=document.getElementById('db-'+ti);
   if(btn){btn.disabled=true;btn.textContent='Saving...';}
   apiWrite({action:'markDone',prospectName:decodeURIComponent(ep),companyName:decodeURIComponent(ec),step}).then(res=>{
-    if(res.success){
-      if(btn){btn.textContent='Sent';btn.classList.add('success');}
-      document.getElementById('op-'+ti)?.classList.add('open');
-    }else{
-      if(btn){btn.textContent=res.error||'Error';btn.disabled=false;}
-    }
+    if(res.success){if(btn){btn.textContent='Sent';btn.classList.add('success');}document.getElementById('op-'+ti)?.classList.add('open');}
+    else{if(btn){btn.textContent=res.error||'Error';btn.disabled=false;}}
   });
 }
 function selectTaskOutcome(ti,type,step){
-  window._tOutcomes[ti]=type;
-  window._tOutcomes['step_'+ti]=step||1;
+  window._tOutcomes[ti]=type;window._tOutcomes['step_'+ti]=step||1;
   document.querySelectorAll('#op-'+ti+' .outcome-opt').forEach(b=>b.classList.remove('selected'));
   event.target.classList.add('selected');
   const od=document.getElementById('od-'+ti);
@@ -929,38 +780,31 @@ function selectTaskOutcome(ti,type,step){
   const cN=card.querySelector('.task-company').textContent;
   if(type==='not_interested'){
     od.innerHTML='';
-    const closeStep=window._tOutcomes['step_'+ti]||1;
-    apiWrite({action:'closeProspect',prospectName:pN,companyName:cN,step:closeStep}).then(res=>{
+    apiWrite({action:'closeProspect',prospectName:pN,companyName:cN,step:window._tOutcomes['step_'+ti]||1}).then(res=>{
       if(res.success){toast('Prospect archived');setTimeout(()=>renderTasks(),1500);}
       else{toast('Error: '+(res.error||'Could not archive'));}
     });
   }else{
     if(!document.getElementById('dp-'+ti)){
-      const div=document.createElement('div');
-      div.className='date-picker-row';
-      const inp=document.createElement('input');
-      inp.type='date';inp.id='dp-'+ti;
-      const btn=document.createElement('button');
-      btn.className='save-outcome-btn';btn.textContent='Save';
+      const div=document.createElement('div');div.className='date-picker-row';
+      const inp=document.createElement('input');inp.type='date';inp.id='dp-'+ti;
+      const btn=document.createElement('button');btn.className='save-outcome-btn';btn.textContent='Save';
       btn.onclick=function(){saveTaskOutcome(ti);};
-      div.appendChild(inp);div.appendChild(btn);
-      od.appendChild(div);
+      div.appendChild(inp);div.appendChild(btn);od.appendChild(div);
     }
   }
 }
 function saveTaskOutcome(ti){
-  const type=window._tOutcomes[ti];
-  const date=document.getElementById('dp-'+ti)?.value;
+  const type=window._tOutcomes[ti];const date=document.getElementById('dp-'+ti)?.value;
   if(!date){toast('Please pick a date');return;}
   const card=document.getElementById('tc-'+ti);
-  const taskStep=window._tOutcomes['step_'+ti]||1;
-  apiWrite({action:'scheduleFollowUp',prospectName:card.querySelector('.task-prospect').textContent,companyName:card.querySelector('.task-company').textContent,date,step:taskStep,type:type==='meeting'?'Meeting Scheduled':'Follow Up'}).then(res=>{
-    if(res.success)toast('Scheduled for '+date);else toast(res.error||'Error');
+  apiWrite({action:'scheduleFollowUp',prospectName:card.querySelector('.task-prospect').textContent,companyName:card.querySelector('.task-company').textContent,date,step:window._tOutcomes['step_'+ti]||1,type:type==='meeting'?'Meeting Scheduled':'Follow Up'}).then(res=>{
+    if(res.success) toast('Scheduled for '+date);else toast(res.error||'Error');
   });
 }
 function saveTaskNotes(ti,ep,ec){
   const notes=document.getElementById('ni-'+ti)?.value||'';
-  apiWrite({action:'saveNotes',prospectName:decodeURIComponent(ep),companyName:decodeURIComponent(ec),notes}).then(res=>{if(res.success)toast('Notes saved');});
+  apiWrite({action:'saveNotes',prospectName:decodeURIComponent(ep),companyName:decodeURIComponent(ec),notes}).then(res=>{if(res.success) toast('Notes saved');});
 }
 
 // COMPANIES
@@ -1030,7 +874,7 @@ function renderCompanyDetail(cName,data){
   const active=prospects.filter(p=>p.status!=='Not Interested'&&p.status!=='Paused');
   const archived=prospects.filter(p=>p.status==='Not Interested'||p.status==='Paused');
   html+='<div style="font-size:16px;font-weight:700;margin-bottom:12px">'+prospects.length+' Prospect'+(prospects.length!==1?'s':'')+'</div>';
-  if(!prospects.length)html+='<div class="empty-state" style="padding:40px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border)">No prospects yet.</div>';
+  if(!prospects.length) html+='<div class="empty-state" style="padding:40px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border)">No prospects yet.</div>';
   else{
     html+=buildProspectCards(active,c.name||cName,false);
     if(archived.length){
@@ -1055,8 +899,7 @@ function buildProspectCards(prospects,companyName,isArchived){
     const tp=p.touchpoints||[];
     html+='<div class="prospect-card '+(isArchived?'archived':'')+'" id="pc-'+idx+'">'
       +'<div class="prospect-card-header">'
-      +'<div class="prospect-info">'
-      +'<h3>'+p.name+'</h3>'
+      +'<div class="prospect-info"><h3>'+p.name+'</h3>'
       +'<div class="prospect-title">'+(p.title||'')+'</div>'
       +'<div class="prospect-contact">'
       +(p.email?'<div class="prospect-contact-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>'+p.email+'</div>':'')
@@ -1087,7 +930,6 @@ function buildProspectCards(prospects,companyName,isArchived){
         +(msg?'<button class="copy-btn" onclick="copyText(document.getElementById(\'mt-'+idx+'-'+mb.step+'\').innerText)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button>':'')
         +(!isDone&&!isArchived?'<button class="done-btn" id="cdb-'+idx+'-'+mb.step+'" onclick="markCompanyDone(\''+encodeURIComponent(p.name)+'\',\''+encodeURIComponent(companyName)+'\','+mb.step+',\''+idx+'\')">Mark as sent</button>':(isDone?'<span class="badge badge-green">Sent</span>':''))
         +'</div>'
-        // Outcome panel with notes INSIDE it - auto-open if sent
         +'<div class="outcome-panel '+(isDone?'open':'')+'" id="cop-'+idx+'-'+mb.step+'">'
         +'<div class="outcome-label">What was the outcome?</div>'
         +'<div class="outcome-options">'
@@ -1096,29 +938,22 @@ function buildProspectCards(prospects,companyName,isArchived){
         +'<button class="outcome-opt" onclick="selectCompanyOutcome(\''+idx+'\','+mb.step+',\'not_interested\',\''+encodeURIComponent(p.name)+'\',\''+encodeURIComponent(companyName)+'\')">Not Interested</button>'
         +'</div>'
         +'<div id="cod-'+idx+'-'+mb.step+'"></div>'
-        // Pre-fill date picker if outcome already set
         +(isDone&&t.outcome&&t.outcome!=='Not Interested'?'<div class="date-picker-row"><input type="date" id="cdp-'+idx+'-'+mb.step+'" /><button class="save-outcome-btn" onclick="saveCompanyOutcome(\''+idx+'\','+mb.step+',\''+encodeURIComponent(p.name)+'\',\''+encodeURIComponent(companyName)+'\',\'follow_up\')">Update</button></div>':'')
-        // Notes directly below outcome in same panel
         +'<div class="notes-row" style="margin-top:10px">'
         +'<div class="outcome-label">Notes for this message</div>'
         +'<textarea class="notes-input" id="mn-'+idx+'-'+mb.step+'" rows="2" placeholder="Add notes about this message..."></textarea>'
         +'<button class="save-notes-btn" onclick="saveMsgNote(\''+idx+'\','+mb.step+',\''+encodeURIComponent(p.name)+'\',\''+encodeURIComponent(companyName)+'\')">Save note</button>'
         +'</div></div></div>';
 
-      // Show saved note for this message if exists (parsed from overall notes)
-      // Match note using short label (strip parenthetical like "(BDC)")
       const baseLabel=mb.label.indexOf(' (')>-1?mb.label.split(' (')[0]:mb.label;
       const msgLabel='['+baseLabel+']:';
       const savedMsgNote=p.notes?p.notes.split('\n').filter(l=>l.startsWith(msgLabel)).map(l=>l.replace(msgLabel,'').trim()).join(' '):'';
-      if(savedMsgNote){
-        html+='<div style="margin:4px 0 8px 0;padding:8px 12px;background:var(--orange-light);border-radius:var(--radius-sm);font-size:12px;color:var(--orange);border-left:3px solid var(--orange)">Note: '+savedMsgNote+'</div>';
-      }
+      if(savedMsgNote) html+='<div style="margin:4px 0 8px 0;padding:8px 12px;background:var(--orange-light);border-radius:var(--radius-sm);font-size:12px;color:var(--orange);border-left:3px solid var(--orange)">Note: '+savedMsgNote+'</div>';
     });
 
-    // TIMELINE
     const sentItems=steps.filter(mb=>tp[mb.step-1]&&tp[mb.step-1].done);
     html+='<div class="timeline"><div class="timeline-title">Timeline</div>';
-    if(!sentItems.length&&!p.notes)html+='<div style="font-size:12px;color:var(--text3)">No activity yet</div>';
+    if(!sentItems.length&&!p.notes) html+='<div style="font-size:12px;color:var(--text3)">No activity yet</div>';
     else{
       sentItems.forEach(mb=>{
         const t=tp[mb.step-1];
@@ -1127,7 +962,7 @@ function buildProspectCards(prospects,companyName,isArchived){
           +'<div class="timeline-text">'+mb.label+' sent'+(t.outcome?' - <strong>'+t.outcome+'</strong>':'')+'</div>'
           +'</div></div>';
       });
-      if(p.notes)html+='<div class="timeline-item"><div class="timeline-dot orange"></div>'
+      if(p.notes) html+='<div class="timeline-item"><div class="timeline-dot orange"></div>'
         +'<div class="timeline-content"><div class="timeline-date">Note</div>'
         +'<div class="timeline-note">'+p.notes+'</div></div></div>';
     }
@@ -1156,84 +991,55 @@ function markCompanyDone(ep,ec,step,idx){
     }
   });
 }
-
 function selectCompanyOutcome(idx,step,type,ep,ec){
   document.querySelectorAll('#cop-'+idx+'-'+step+' .outcome-opt').forEach(b=>b.classList.remove('selected'));
   event.target.classList.add('selected');
   const od=document.getElementById('cod-'+idx+'-'+step);
-  const pN=decodeURIComponent(ep);
-  const cN=decodeURIComponent(ec);
+  const pN=decodeURIComponent(ep);const cN=decodeURIComponent(ec);
   if(type==='not_interested'){
     od.innerHTML='';
     apiWrite({action:'closeProspect',prospectName:pN,companyName:cN,step:step}).then(res=>{
-      if(res.success){
-        toast('Prospect archived - reloading...');
-        delete _CC[cN];
-        setTimeout(()=>loadCompany(encodeURIComponent(cN)),1200);
-      }else{
-        toast('Error: '+(res.error||'Could not archive'));
-      }
+      if(res.success){toast('Prospect archived - reloading...');delete _CC[cN];setTimeout(()=>loadCompany(encodeURIComponent(cN)),1200);}
+      else{toast('Error: '+(res.error||'Could not archive'));}
     });
   }else{
     if(!document.getElementById('cdp-'+idx+'-'+step)){
-      const div=document.createElement('div');
-      div.className='date-picker-row';
-      const inp=document.createElement('input');
-      inp.type='date';inp.id='cdp-'+idx+'-'+step;
-      const btn=document.createElement('button');
-      btn.className='save-outcome-btn';btn.textContent='Save';
-      // Capture variables for closure
-      const capturedIdx=idx,capturedStep=step,capturedEp=ep,capturedEc=ec,capturedType=type;
-      btn.onclick=function(){saveCompanyOutcome(capturedIdx,capturedStep,capturedEp,capturedEc,capturedType);};
-      div.appendChild(inp);div.appendChild(btn);
-      od.appendChild(div);
+      const div=document.createElement('div');div.className='date-picker-row';
+      const inp=document.createElement('input');inp.type='date';inp.id='cdp-'+idx+'-'+step;
+      const btn=document.createElement('button');btn.className='save-outcome-btn';btn.textContent='Save';
+      const cIdx=idx,cStep=step,cEp=ep,cEc=ec,cType=type;
+      btn.onclick=function(){saveCompanyOutcome(cIdx,cStep,cEp,cEc,cType);};
+      div.appendChild(inp);div.appendChild(btn);od.appendChild(div);
     }else{
-      // Update onclick for new type
       const btn=od.querySelector('.save-outcome-btn');
-      if(btn){
-        const capturedIdx=idx,capturedStep=step,capturedEp=ep,capturedEc=ec,capturedType=type;
-        btn.onclick=function(){saveCompanyOutcome(capturedIdx,capturedStep,capturedEp,capturedEc,capturedType);};
-      }
+      if(btn){const cIdx=idx,cStep=step,cEp=ep,cEc=ec,cType=type;btn.onclick=function(){saveCompanyOutcome(cIdx,cStep,cEp,cEc,cType);};}
     }
   }
 }
-
 function saveCompanyOutcome(idx,step,ep,ec,type){
   const date=document.getElementById('cdp-'+idx+'-'+step)?.value;
   if(!date){toast('Please pick a date');return;}
   apiWrite({action:'scheduleFollowUp',prospectName:decodeURIComponent(ep),companyName:decodeURIComponent(ec),date,step:step,type:type==='meeting'?'Meeting Scheduled':'Follow Up'}).then(res=>{
-    if(res.success)toast('Scheduled for '+date);else toast(res.error||'Error');
+    if(res.success) toast('Scheduled for '+date);else toast(res.error||'Error');
   });
 }
-
 function restorePipelineProspect(ep,ec){
-  const pN=decodeURIComponent(ep);
-  const cN=decodeURIComponent(ec);
-  apiWrite({action:'restoreProspect',prospectName:pN,companyName:cN}).then(res=>{
+  apiWrite({action:'restoreProspect',prospectName:decodeURIComponent(ep),companyName:decodeURIComponent(ec)}).then(res=>{
     if(res.success){toast('Prospect restored to Active');renderPipeline('archived');}
     else toast('Error: '+(res.error||'Could not restore'));
   });
 }
-
 function restoreProspect(ep,ec){
-  const pN=decodeURIComponent(ep);
   const cN=decodeURIComponent(ec);
-  apiWrite({action:'restoreProspect',prospectName:pN,companyName:cN}).then(res=>{
-    if(res.success){
-      toast('Prospect restored to Active');
-      delete _CC[cN];
-      setTimeout(()=>loadCompany(encodeURIComponent(cN)),800);
-    }else{
-      toast('Error: '+(res.error||'Could not restore'));
-    }
+  apiWrite({action:'restoreProspect',prospectName:decodeURIComponent(ep),companyName:cN}).then(res=>{
+    if(res.success){toast('Prospect restored to Active');delete _CC[cN];setTimeout(()=>loadCompany(encodeURIComponent(cN)),800);}
+    else{toast('Error: '+(res.error||'Could not restore'));}
   });
 }
-
 function saveCompanyNotes(idx,ep,ec){
   const notes=document.getElementById('cn-'+idx)?.value||'';
-  apiWrite({action:'saveNotes',prospectName:decodeURIComponent(ep),companyName:decodeURIComponent(ec),notes}).then(res=>{if(res.success)toast('Notes saved');});
+  apiWrite({action:'saveNotes',prospectName:decodeURIComponent(ep),companyName:decodeURIComponent(ec),notes}).then(res=>{if(res.success) toast('Notes saved');});
 }
-
 function saveMsgNote(idx,step,ep,ec){
   const msgNote=document.getElementById('mn-'+idx+'-'+step)?.value||'';
   if(!msgNote.trim()){toast('Please write a note first');return;}
@@ -1242,13 +1048,9 @@ function saveMsgNote(idx,step,ep,ec){
   const existing=mainEl?.value||'';
   const sep=existing?'\n':'';
   const newNote=existing+sep+'['+labels[step]+']: '+msgNote;
-  if(mainEl)mainEl.value=newNote;
+  if(mainEl) mainEl.value=newNote;
   apiWrite({action:'saveNotes',prospectName:decodeURIComponent(ep),companyName:decodeURIComponent(ec),notes:newNote}).then(res=>{
-    if(res.success){
-      toast('Note saved');
-      const el=document.getElementById('mn-'+idx+'-'+step);
-      if(el)el.value='';
-    }
+    if(res.success){toast('Note saved');const el=document.getElementById('mn-'+idx+'-'+step);if(el) el.value='';}
   });
 }
 
@@ -1263,7 +1065,7 @@ function renderPipeline(tab){
     +'<button class="tab '+(_pipelineTab==='active'?'active':'')+'" onclick="renderPipeline(\'active\')">Active ('+active.length+')</button>'
     +'<button class="tab '+(_pipelineTab==='archived'?'active':'')+'" onclick="renderPipeline(\'archived\')">Archived ('+archived.length+')</button>'
     +'</div>';
-  if(!list.length)html+='<div class="empty-state" style="padding:60px">'+(_pipelineTab==='active'?'No active prospects.':'No archived prospects.')+'</div>';
+  if(!list.length) html+='<div class="empty-state" style="padding:60px">'+(_pipelineTab==='active'?'No active prospects.':'No archived prospects.')+'</div>';
   else{
     html+='<div class="full-panel"><table class="data-table"><thead><tr><th>Prospect</th><th>Company</th><th>Title</th><th>Step</th><th>Follow Up</th><th>Status</th><th>Priority</th>'+(_pipelineTab==='archived'?'<th></th>':'')+'</tr></thead><tbody>';
     list.forEach(p=>{
@@ -1330,7 +1132,7 @@ function renderActivity(){
   document.getElementById('page-content').innerHTML=html;
 }
 
-// UPLOAD
+// UPLOAD — improved with step-by-step progress
 function loadUpload(){
   document.getElementById('page-content').innerHTML='<div class="upload-grid">'
     +'<div><div style="font-size:15px;font-weight:600;margin-bottom:12px">Company Screenshot</div>'
@@ -1346,45 +1148,76 @@ function loadUpload(){
     +'<input type="file" id="pr-input" accept="image/*" style="display:none" onchange="handleUpload(this,\'pr-result\',\'prospect\')">'
     +'</div><div id="pr-result"></div></div></div>';
 }
+
 function dragOver(e,z){e.preventDefault();document.getElementById(z)?.classList.add('drag-over');}
 function dragLeave(z){document.getElementById(z)?.classList.remove('drag-over');}
 function dropFile(e,resultId,type){
-  e.preventDefault();
-  dragLeave(type==='company'?'co-zone':'pr-zone');
-  const f=e.dataTransfer?.files[0];
-  if(!f)return;
-  uploadFile(f,resultId,type);
+  e.preventDefault();dragLeave(type==='company'?'co-zone':'pr-zone');
+  const f=e.dataTransfer?.files[0];if(!f) return;uploadFile(f,resultId,type);
 }
-function handleUpload(input,resultId,type){const f=input.files[0];if(!f)return;uploadFile(f,resultId,type);}
+function handleUpload(input,resultId,type){const f=input.files[0];if(!f) return;uploadFile(f,resultId,type);}
+
 function uploadFile(file,resultId,type){
   const el=document.getElementById(resultId);
-  el.innerHTML='<div class="upload-result loading">Processing... this may take 30-60 seconds</div>';
+  const isProspect=type==='prospect';
+
+  // Show step-by-step progress
+  el.innerHTML='<div class="upload-result loading">'
+    +'<div style="font-weight:600;margin-bottom:8px">Processing... please wait (30-90 sec)</div>'
+    +'<div class="upload-steps">'
+    +'<div class="upload-step active" id="'+resultId+'-s1"><div class="upload-step-dot"></div>Uploading image...</div>'
+    +'<div class="upload-step" id="'+resultId+'-s2"><div class="upload-step-dot"></div>Extracting '+(isProspect?'prospect':'company')+' info from screenshot...</div>'
+    +(isProspect?'<div class="upload-step" id="'+resultId+'-s3"><div class="upload-step-dot"></div>Researching company online...</div>':'')
+    +'<div class="upload-step" id="'+resultId+'-s'+(isProspect?4:3)+'"><div class="upload-step-dot"></div>'+(isProspect?'Generating personalised messages...':'Saving company data...')+'</div>'
+    +'</div></div>';
+
+  function setStep(n){
+    for(let i=1;i<=4;i++){
+      const s=document.getElementById(resultId+'-s'+i);
+      if(!s) continue;
+      if(i<n) s.className='upload-step done';
+      else if(i===n) s.className='upload-step active';
+      else s.className='upload-step';
+    }
+  }
+
   const reader=new FileReader();
   reader.onload=function(e){
     const b64=e.target.result.split(',')[1];
     const fd=new FormData();fd.append('image',b64);
+    setStep(1);
     fetch('https://api.imgbb.com/1/upload?key='+IMGBB,{method:'POST',body:fd})
       .then(r=>r.json())
       .then(imgRes=>{
-        if(!imgRes.success)throw new Error('Image upload failed');
-        return apiRaw({action:type==='company'?'uploadCompany':'uploadProspect',imageUrl:imgRes.data.url});
+        if(!imgRes.success) throw new Error('Image upload failed — please try a different screenshot');
+        setStep(2);
+        return apiRaw({action:isProspect?'uploadProspect':'uploadCompany', imageUrl:imgRes.data.url});
       })
       .then(res=>{
         if(res.success){
-          el.innerHTML='<div class="upload-result success">'+(res.company||res.prospect||'Item')+' added successfully</div>';
+          el.innerHTML='<div class="upload-result success">'
+            +'<div style="font-weight:600;margin-bottom:4px">'+(isProspect?'✓ Prospect added: '+(res.prospect||''):'✓ Company added: '+(res.company||''))+'</div>'
+            +(isProspect&&res.company?'<div style="font-size:12px;opacity:0.85">Company: '+res.company+'</div>':'')
+            +'</div>';
           toast('Upload successful');
           loadAll().catch(()=>{});
         }else{
-          el.innerHTML='<div class="upload-result error">'+(res.error||'Upload failed')+'</div>';
+          el.innerHTML='<div class="upload-result error">'
+            +'<div style="font-weight:600;margin-bottom:4px">Upload failed</div>'
+            +'<div style="font-size:12px">'+(res.error||'Unknown error')+'</div>'
+            +(res.error&&res.error.includes('name')?'<div style="font-size:12px;margin-top:6px;opacity:0.8">Tip: Try a clearer screenshot showing the full name and company.</div>':'')
+            +'</div>';
         }
       })
-      .catch(err=>{el.innerHTML='<div class="upload-result error">'+err.message+'</div>';});
+      .catch(err=>{
+        el.innerHTML='<div class="upload-result error">'
+          +'<div style="font-weight:600;margin-bottom:4px">Error</div>'
+          +'<div style="font-size:12px">'+err.message+'</div>'
+          +'</div>';
+      });
   };
   reader.readAsDataURL(file);
 }
-
-// INIT
-// Init handled by auth system above
 </script>
 </body>
 </html>
