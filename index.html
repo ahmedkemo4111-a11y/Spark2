@@ -308,7 +308,7 @@ body.dark{--bg:#111110;--surface:#1c1c1a;--surface2:#252523;--border:#2e2e2b;--t
      ONBOARDING SCREEN
      ============================================================ -->
 <div class="auth-screen" id="onboarding-screen">
-  <div class="auth-box" style="max-width:500px">
+  <div class="auth-box" style="max-width:520px;max-height:90vh;overflow-y:auto">
     <div class="auth-logo">
       <div class="auth-logo-icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
       <div><div class="auth-logo-name">Spark</div><div class="auth-logo-tag">Let's set up your account</div></div>
@@ -317,30 +317,58 @@ body.dark{--bg:#111110;--surface:#1c1c1a;--surface2:#252523;--border:#2e2e2b;--t
       <div class="onb-dot done" id="onb-dot-1"></div>
       <div class="onb-dot" id="onb-dot-2"></div>
       <div class="onb-dot" id="onb-dot-3"></div>
+      <div class="onb-dot" id="onb-dot-4"></div>
+      <div class="onb-dot" id="onb-dot-5"></div>
     </div>
-
-    <!-- Step 1: Services -->
     <div class="onb-step active" id="onb-step-1">
       <div class="auth-title">What services do you offer?</div>
-      <div class="auth-sub">Select all that apply -- this shapes your outreach messages</div>
-      <div class="onb-group">
-        <div class="onb-options" id="services-opts">
-          <div class="onb-opt" onclick="toggleOpt(this,'services')">Implementation</div>
-          <div class="onb-opt" onclick="toggleOpt(this,'services')">Support</div>
-          <div class="onb-opt" onclick="toggleOpt(this,'services')">Migration</div>
-          <div class="onb-opt" onclick="toggleOpt(this,'services')">Customization</div>
-          <div class="onb-opt" onclick="toggleOpt(this,'services')">System Enhancement</div>
-          <div class="onb-opt" onclick="toggleOpt(this,'services')">Training</div>
-          <div class="onb-opt" onclick="toggleOpt(this,'services')">Consulting</div>
-        </div>
+      <div class="auth-sub">Select all that apply</div>
+      <div class="onb-options" id="services-opts" style="margin-bottom:20px">
+        <div class="onb-opt" onclick="toggleOpt(this,'services')">Implementation</div>
+        <div class="onb-opt" onclick="toggleOpt(this,'services')">Support</div>
+        <div class="onb-opt" onclick="toggleOpt(this,'services')">Migration</div>
+        <div class="onb-opt" onclick="toggleOpt(this,'services')">Customization</div>
+        <div class="onb-opt" onclick="toggleOpt(this,'services')">System Enhancement</div>
+        <div class="onb-opt" onclick="toggleOpt(this,'services')">Training</div>
+        <div class="onb-opt" onclick="toggleOpt(this,'services')">Consulting</div>
       </div>
       <button class="auth-btn" onclick="onbNext(2)">Continue</button>
     </div>
-
-    <!-- Step 2: Focus & Licensing -->
     <div class="onb-step" id="onb-step-2">
-      <div class="auth-title">Your focus & offering</div>
-      <div class="auth-sub">Help us personalize your messages further</div>
+      <div class="auth-title">Tell us about your company</div>
+      <div class="auth-sub">2-3 sentences about what makes you different</div>
+      <textarea class="auth-input" id="company-desc" rows="4" placeholder="e.g. We are a boutique SAP partner specializing in mid-market S/4HANA migrations across the GCC region with 15 years experience and 120+ successful projects." style="resize:vertical;font-family:var(--font);font-size:13px;line-height:1.5;margin-bottom:16px"></textarea>
+      <button class="auth-btn" onclick="onbNext(3)">Continue</button>
+    </div>
+    <div class="onb-step" id="onb-step-3">
+      <div class="auth-title">Your unique offering</div>
+      <div class="auth-sub">Shapes what gets highlighted in your messages</div>
+      <div class="onb-group">
+        <div class="onb-group-label">Proprietary tools or accelerators (select all)</div>
+        <div class="onb-options" id="accelerators-opts">
+          <div class="onb-opt" onclick="toggleOpt(this,'accelerators')">Implementation accelerator</div>
+          <div class="onb-opt" onclick="toggleOpt(this,'accelerators')">AI solutions on SAP BTP</div>
+          <div class="onb-opt" onclick="toggleOpt(this,'accelerators')">Automation/RPA tools</div>
+          <div class="onb-opt" onclick="toggleOpt(this,'accelerators')">Pre-built templates</div>
+          <div class="onb-opt" onclick="toggleOpt(this,'accelerators')">None</div>
+        </div>
+      </div>
+      <div class="onb-group" style="margin-top:16px">
+        <div class="onb-group-label">Main value proposition</div>
+        <div class="onb-options" id="valueprop-opts">
+          <div class="onb-opt" onclick="selectSingle(this,'valueprop')">Faster go-live</div>
+          <div class="onb-opt" onclick="selectSingle(this,'valueprop')">Cost reduction</div>
+          <div class="onb-opt" onclick="selectSingle(this,'valueprop')">Risk reduction</div>
+          <div class="onb-opt" onclick="selectSingle(this,'valueprop')">AI capabilities</div>
+          <div class="onb-opt" onclick="selectSingle(this,'valueprop')">Local expertise</div>
+          <div class="onb-opt" onclick="selectSingle(this,'valueprop')">Long-term partnership</div>
+        </div>
+      </div>
+      <button class="auth-btn" onclick="onbNext(4)" style="margin-top:16px">Continue</button>
+    </div>
+    <div class="onb-step" id="onb-step-4">
+      <div class="auth-title">Your focus and offering</div>
+      <div class="auth-sub">Helps target the right prospects</div>
       <div class="onb-group">
         <div class="onb-group-label">Do you work with SAP users only?</div>
         <div class="onb-options" id="saponly-opts">
@@ -349,39 +377,39 @@ body.dark{--bg:#111110;--surface:#1c1c1a;--surface2:#252523;--border:#2e2e2b;--t
           <div class="onb-opt" onclick="selectSingle(this,'saponly')">Both SAP and non-SAP</div>
         </div>
       </div>
-      <div class="onb-group">
+      <div class="onb-group" style="margin-top:16px">
         <div class="onb-group-label">Do you offer SAP licensing?</div>
         <div class="onb-options" id="licensing-opts">
           <div class="onb-opt" onclick="selectSingle(this,'licensing')">Yes, we offer licensing</div>
           <div class="onb-opt" onclick="selectSingle(this,'licensing')">No, services only</div>
         </div>
       </div>
-      <button class="auth-btn" onclick="onbNext(3)">Continue</button>
+      <button class="auth-btn" onclick="onbNext(5)" style="margin-top:16px">Continue</button>
     </div>
-
-    <!-- Step 3: Approach & Tone -->
-    <div class="onb-step" id="onb-step-3">
+    <div class="onb-step" id="onb-step-5">
       <div class="auth-title">Your outreach style</div>
-      <div class="auth-sub">How do you like to communicate with prospects?</div>
+      <div class="auth-sub">Select all that apply - the AI will blend your choices</div>
       <div class="onb-group">
-        <div class="onb-group-label">Approach</div>
+        <div class="onb-group-label">Approach (select all that fit)</div>
         <div class="onb-options" id="approach-opts">
-          <div class="onb-opt" onclick="selectSingle(this,'approach')">Consultative</div>
-          <div class="onb-opt" onclick="selectSingle(this,'approach')">Value-led</div>
-          <div class="onb-opt" onclick="selectSingle(this,'approach')">Direct</div>
-          <div class="onb-opt" onclick="selectSingle(this,'approach')">Relationship-first</div>
+          <div class="onb-opt" onclick="toggleOpt(this,'approach')">Consultative</div>
+          <div class="onb-opt" onclick="toggleOpt(this,'approach')">Value-led</div>
+          <div class="onb-opt" onclick="toggleOpt(this,'approach')">Direct</div>
+          <div class="onb-opt" onclick="toggleOpt(this,'approach')">Relationship-first</div>
+          <div class="onb-opt" onclick="toggleOpt(this,'approach')">Educational</div>
         </div>
       </div>
-      <div class="onb-group">
-        <div class="onb-group-label">Tone preference</div>
+      <div class="onb-group" style="margin-top:16px">
+        <div class="onb-group-label">Tone (select all that fit)</div>
         <div class="onb-options" id="tone-opts">
-          <div class="onb-opt" onclick="selectSingle(this,'tone')">Professional</div>
-          <div class="onb-opt" onclick="selectSingle(this,'tone')">Friendly</div>
-          <div class="onb-opt" onclick="selectSingle(this,'tone')">Formal</div>
-          <div class="onb-opt" onclick="selectSingle(this,'tone')">Casual</div>
+          <div class="onb-opt" onclick="toggleOpt(this,'tone')">Professional</div>
+          <div class="onb-opt" onclick="toggleOpt(this,'tone')">Friendly</div>
+          <div class="onb-opt" onclick="toggleOpt(this,'tone')">Formal</div>
+          <div class="onb-opt" onclick="toggleOpt(this,'tone')">Casual</div>
+          <div class="onb-opt" onclick="toggleOpt(this,'tone')">Confident</div>
         </div>
       </div>
-      <button class="auth-btn" id="onb-finish-btn" onclick="doSaveProfile()">Finish setup -></button>
+      <button class="auth-btn" id="onb-finish-btn" onclick="doSaveProfile()" style="margin-top:16px">Finish setup -></button>
     </div>
   </div>
 </div>
@@ -440,7 +468,7 @@ const IMGBB = '78d076b6b3ce492b51f2219de8166a29';
 
 let _userId = sessionStorage.getItem('spark_uid') || '';
 let _userProfile = JSON.parse(sessionStorage.getItem('spark_profile') || 'null');
-const _onbState = {services:[], saponly:'', licensing:'', approach:'', tone:''};
+const _onbState = {services:'', accelerators:'', valueprop:'', saponly:'', licensing:'', approach:'', tone:''};
 
 function apiAuth(params) {
   const url = API + '?' + Object.entries(params).map(([k,v]) => k + '=' + encodeURIComponent(v)).join('&');
@@ -558,8 +586,7 @@ function selectSingle(el, group) {
 function onbNext(step) {
   document.querySelectorAll('.onb-step').forEach(s => s.classList.remove('active'));
   document.getElementById('onb-step-' + step).classList.add('active');
-  // Update progress dots
-  for (let i = 1; i <= 3; i++) {
+  for (let i = 1; i <= 5; i++) {
     const dot = document.getElementById('onb-dot-' + i);
     if (dot) dot.classList.toggle('done', i <= step);
   }
@@ -569,18 +596,30 @@ async function doSaveProfile() {
   const btn = document.getElementById('onb-finish-btn');
   btn.disabled = true; btn.textContent = 'Saving...';
   try {
+    const companyDesc = document.getElementById('company-desc')?.value||'';
     const res = await apiAuth({
       action:'saveProfile',
       userId: _userId,
       services: _onbState.services || '',
-      approach: _onbState.approach || 'Consultative',
-      tone: _onbState.tone || 'Professional',
+      companyDescription: companyDesc,
+      accelerators: _onbState.accelerators || '',
+      valueProp: _onbState.valueprop || '',
       sapOnly: _onbState.saponly || '',
-      licensing: _onbState.licensing || ''
+      licensing: _onbState.licensing || '',
+      approach: _onbState.approach || 'Consultative',
+      tone: _onbState.tone || 'Professional'
     });
     if (res.success) {
-      // Update local profile
-      _userProfile = Object.assign(_userProfile || {}, _onbState);
+      _userProfile = Object.assign(_userProfile||{}, {
+        services:_onbState.services,
+        companyDescription:companyDesc,
+        accelerators:_onbState.accelerators,
+        valueProp:_onbState.valueprop,
+        sapOnly:_onbState.saponly,
+        licensing:_onbState.licensing,
+        approach:_onbState.approach,
+        tone:_onbState.tone
+      });
       sessionStorage.setItem('spark_profile', JSON.stringify(_userProfile));
       showApp();
       loadAll().then(() => showPage('dashboard'));
