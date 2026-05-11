@@ -414,6 +414,7 @@ body.dark{--bg:#111110;--surface:#1c1c1a;--surface2:#252523;--border:#2e2e2b;--t
     <div class="user-avatar">AH</div>
     <div class="user-info"><div class="user-name">Ahmed H.</div><div class="user-plan">Pro Plan</div></div>
     <button class="theme-btn" onclick="toggleTheme()"><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+    <button class="theme-btn" title="Logout" onclick="doLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
   </div>
 </aside>
 
@@ -457,12 +458,14 @@ function showScreen(name) {
 
 function showApp() {
   document.querySelectorAll('.auth-screen').forEach(s => s.classList.remove('active'));
-  // Update sidebar user info
   if (_userProfile) {
-    const initials = (_userProfile.companyName || 'U').substring(0,2).toUpperCase();
+    const name = _userProfile.companyName || 'User';
+    const initials = name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    const avatarEl = document.querySelector('.user-avatar');
     const nameEl = document.querySelector('.user-name');
     const planEl = document.querySelector('.user-plan');
-    if (nameEl) nameEl.textContent = _userProfile.companyName || 'User';
+    if (avatarEl) avatarEl.textContent = initials;
+    if (nameEl) nameEl.textContent = name;
     if (planEl) planEl.textContent = (_userProfile.plan || 'trial') + ' plan';
   }
 }
