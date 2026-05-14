@@ -483,6 +483,7 @@ async function doLogin() {
     if (res.success) {
       _userId = res.userId;
       _userProfile = res;
+      _D = null; _CC = {}; // clear any previous user's cached data
       sessionStorage.setItem('spark_uid', _userId);
       sessionStorage.setItem('spark_profile', JSON.stringify(res));
       if (res.needsOnboarding) { showScreen('onboarding'); }
@@ -568,6 +569,7 @@ function doLogout() {
   sessionStorage.removeItem('spark_uid');
   sessionStorage.removeItem('spark_profile');
   _userId = ''; _userProfile = null;
+  _D = null; _CC = {}; // clear all cached data so next user sees nothing stale
   showScreen('login');
 }
 
@@ -594,8 +596,16 @@ function apiRaw(params){
   const url=API+'?'+Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
   return fetch(url).then(r=>r.json());
 }
-function loadAll(){return apiRaw({action:'all'}).then(data=>{_D=data;return data;});}
-function apiWrite(params){const result=apiRaw(params);result.then(()=>loadAll().catch(()=>{}));return result;}
+let _stale = false; // marks data as needing refresh on next page nav
+
+function loadAll(){return apiRaw({action:'all'}).then(data=>{_D=data;_stale=false;_CC={};return data;});}
+
+// apiWrite: fire and forget — mark stale, don't block on reload
+function apiWrite(params){
+  const result=apiRaw(params);
+  result.then(()=>{_stale=true;}).catch(()=>{});
+  return result;
+}
 
 function toast(msg,dur=3000){
   const el=document.getElementById('toast');
@@ -635,7 +645,11 @@ function showPage(page,extra){
   document.getElementById('topbar-sub').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   if(page==='upload'){loadUpload();return;}
   document.getElementById('page-content').innerHTML=skeletonCards(page==='dashboard'?2:4);
-  if(_D) renderPage(page,extra);
+  if(_stale||!_D){
+    loadAll().then(()=>renderPage(page,extra));
+  } else {
+    renderPage(page,extra);
+  }
 }
 function renderPage(page,extra){
   if(page==='dashboard') renderDashboard();
