@@ -175,18 +175,40 @@
   .feature-card p { font-size: 14px; color: var(--muted); line-height: 1.7; }
 
   /* PRICING */
-  .pricing-section { background: var(--ink); color: white; text-align: center; }
+  .pricing-section { background: var(--ink); color: white; }
   .pricing-section .section-title { color: white; max-width: 100%; margin: 0 auto; }
   .pricing-section .section-label { color: #a78bfa; }
 
-  .pricing-box {
-    display: inline-block; margin-top: 36px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 16px; padding: 36px 52px;
+  .pricing-cards {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 24px; margin-top: 52px;
   }
 
-  .pricing-box p { font-size: 16px; color: rgba(255,255,255,0.65); margin-bottom: 24px; line-height: 1.7; }
+  .pricing-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px; padding: 32px;
+    transition: border-color .2s;
+  }
+
+  .pricing-card.featured {
+    background: var(--spark);
+    border-color: var(--spark);
+  }
+
+  .pricing-plan { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 16px; }
+  .pricing-card.featured .pricing-plan { color: rgba(255,255,255,0.85); }
+
+  .pricing-price { font-size: 44px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+  .pricing-period { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 24px; }
+  .pricing-card.featured .pricing-period { color: rgba(255,255,255,0.8); }
+
+  .pricing-feature { font-size: 14px; color: rgba(255,255,255,0.65); margin-bottom: 10px; display: flex; gap: 10px; align-items: flex-start; }
+  .pricing-card.featured .pricing-feature { color: rgba(255,255,255,0.9); }
+  .pricing-feature::before { content: '✓'; color: #a78bfa; font-weight: 700; flex-shrink: 0; }
+  .pricing-card.featured .pricing-feature::before { color: white; }
+
+  .pricing-note { font-size: 13px; color: rgba(255,255,255,0.35); margin-top: 40px; text-align: center; }
 
   /* FAQ */
   .faq-section { background: var(--paper); }
@@ -452,11 +474,41 @@
   <section id="pricing" class="pricing-section">
     <div class="container">
       <div class="section-label">Pricing</div>
-      <h2 class="section-title">Pricing plans coming soon</h2>
-      <div class="pricing-box">
-        <p>We're currently in our free trial period.<br>Sign up today and use Spark at no cost while we finalize our plans.</p>
-        <a href="/app.html" class="btn btn-primary">Start for free →</a>
+      <h2 class="section-title">Simple, transparent pricing</h2>
+      <div class="pricing-cards">
+        <div class="pricing-card">
+          <div class="pricing-plan">Starter</div>
+          <div class="pricing-price">Free</div>
+          <div class="pricing-period">trial period</div>
+          <div class="pricing-feature">Up to 15 companies</div>
+          <div class="pricing-feature">Up to 30 prospects</div>
+          <div class="pricing-feature">Message drafting</div>
+          <div class="pricing-feature">Pipeline tracker</div>
+          <div class="pricing-feature">Activity report</div>
+        </div>
+        <div class="pricing-card featured">
+          <div class="pricing-plan">Professional</div>
+          <div class="pricing-price">$79</div>
+          <div class="pricing-period">per month</div>
+          <div class="pricing-feature">Unlimited companies</div>
+          <div class="pricing-feature">Unlimited prospects</div>
+          <div class="pricing-feature">Full message drafting suite</div>
+          <div class="pricing-feature">Advanced analytics</div>
+          <div class="pricing-feature">Excel export</div>
+          <div class="pricing-feature">Priority support</div>
+        </div>
+        <div class="pricing-card">
+          <div class="pricing-plan">Team</div>
+          <div class="pricing-price">$159</div>
+          <div class="pricing-period">per month</div>
+          <div class="pricing-feature">Everything in Pro</div>
+          <div class="pricing-feature">Up to 5 users</div>
+          <div class="pricing-feature">Team analytics</div>
+          <div class="pricing-feature">Dedicated onboarding</div>
+          <div class="pricing-feature">Priority support</div>
+        </div>
       </div>
+      <p class="pricing-note">All plans include a free trial. No credit card required to get started.</p>
     </div>
   </section>
 
