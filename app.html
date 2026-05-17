@@ -312,6 +312,27 @@ body.dark{--bg:#111110;--surface:#1c1c1a;--surface2:#252523;--border:#2e2e2b;--t
   </div>
 </div>
 
+<!-- VERIFY EMAIL -->
+<div class="auth-screen" id="verify-screen">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="auth-logo-icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+      <div><div class="auth-logo-name">Spark</div><div class="auth-logo-tag">SAP Outreach Platform</div></div>
+    </div>
+    <div class="auth-title">Check your email</div>
+    <div class="auth-sub" id="verify-sub">We sent a 6-digit code to your email address. Enter it below to activate your account.</div>
+    <div class="auth-error" id="verify-error"></div>
+    <div class="auth-field">
+      <label>Verification code</label>
+      <input type="text" class="auth-input" id="verify-code" placeholder="Enter 6-digit code" maxlength="6" autocomplete="one-time-code" style="font-size:22px;letter-spacing:8px;text-align:center;font-weight:700"/>
+    </div>
+    <button class="auth-btn" id="verify-btn" onclick="doVerifyEmail()">Verify email</button>
+    <div class="auth-switch" style="margin-top:16px">
+      Didn't receive it? <a onclick="doResendCode()" id="resend-link">Resend code</a>
+    </div>
+  </div>
+</div>
+
 <!-- ONBOARDING -->
 <div class="auth-screen" id="onboarding-screen">
   <div class="auth-box" style="max-width:520px;max-height:90vh;overflow-y:auto">
@@ -425,7 +446,7 @@ body.dark{--bg:#111110;--surface:#1c1c1a;--surface2:#252523;--border:#2e2e2b;--t
   <div class="upgrade-modal">
     <button class="upgrade-modal-close" onclick="closeUpgradeModal()">✕</button>
     <h2>Upgrade Spark</h2>
-    <div class="upgrade-modal-sub" id="upgrade-modal-sub">Unlock more companies, prospects, and features.</div>
+    <div class="upgrade-modal-sub" id="upgrade-modal-sub">Your free plan includes 15 companies and 20 prospects. Upgrade to unlock more.</div>
     <div class="upgrade-plans">
       <div class="upgrade-plan featured">
         <div class="upgrade-plan-name">Professional</div>
@@ -452,7 +473,7 @@ body.dark{--bg:#111110;--surface:#1c1c1a;--surface2:#252523;--border:#2e2e2b;--t
         <button class="upgrade-plan-btn outline" onclick="startCheckout('team')">Start free trial</button>
       </div>
     </div>
-    <div style="text-align:center;font-size:12px;color:var(--text3)">No credit card charged during trial &middot; Cancel anytime</div>
+    <div style="text-align:center;font-size:12px;color:var(--text3)">Cancel anytime · Secure payment via Paddle</div>
   </div>
 </div>
 
@@ -648,6 +669,14 @@ async function doLogin() {
       sessionStorage.setItem('spark_email', res.email || email); // store email for Paddle
       if (res.needsOnboarding) { showScreen('onboarding'); }
       else { showApp(); loadAll().then(() => showPage('dashboard')); }
+    } else if (res.error === 'EMAIL_NOT_VERIFIED') {
+      _userId = res.userId;
+      _userProfile = {userId:res.userId, email:res.email, plan:'trial'};
+      sessionStorage.setItem('spark_uid', _userId);
+      sessionStorage.setItem('spark_email', res.email || '');
+      const verifySub = document.getElementById('verify-sub');
+      if (verifySub) verifySub.textContent = 'We sent a 6-digit code to ' + res.email + '. Enter it below to activate your account.';
+      showScreen('verify');
     } else { showAuthError('login', res.error || 'Invalid email or password'); }
   } catch(e) { showAuthError('login', 'Connection error -- try again'); }
   btn.disabled = false; btn.textContent = 'Sign in';
@@ -663,16 +692,70 @@ async function doSignup() {
   btn.disabled = true; btn.textContent = 'Creating account...';
   try {
     const res = await apiAuth({action:'signup', email, password, companyName:company});
-    if (res.success) {
+    if (res.success || res.needsVerification) {
       _userId = res.userId;
       _userProfile = {userId:res.userId, companyName:company, email, plan:'trial'};
       sessionStorage.setItem('spark_uid', _userId);
       sessionStorage.setItem('spark_profile', JSON.stringify(_userProfile));
       sessionStorage.setItem('spark_email', email);
-      showScreen('onboarding');
+      const verifySub = document.getElementById('verify-sub');
+      if (verifySub) verifySub.textContent = 'We sent a 6-digit code to ' + email + '. Enter it below to activate your account.';
+      showScreen('verify');
     } else { showAuthError('signup', res.error || 'Could not create account'); }
   } catch(e) { showAuthError('signup', 'Connection error -- try again'); }
   btn.disabled = false; btn.textContent = 'Create account';
+}
+
+async function doVerifyEmail() {
+  const code = document.getElementById('verify-code').value.trim();
+  const btn = document.getElementById('verify-btn');
+  const errEl = document.getElementById('verify-error');
+  if (errEl) errEl.classList.remove('show');
+  if (!code || code.length < 6) {
+    if (errEl) { errEl.textContent = 'Please enter the 6-digit code'; errEl.classList.add('show'); }
+    return;
+  }
+  btn.disabled = true; btn.textContent = 'Verifying...';
+  try {
+    const res = await apiAuth({action:'verifyEmail', userId:_userId, code});
+    if (res.success) {
+      btn.textContent = 'Verified!';
+      toast('Email verified! Setting up your account...');
+      setTimeout(() => {
+        const profile = _userProfile || {};
+        if (!profile.services) {
+          showScreen('onboarding');
+        } else {
+          showApp();
+          loadAll().then(() => showPlanSelection());
+        }
+      }, 800);
+    } else {
+      if (errEl) { errEl.textContent = res.error || 'Incorrect code'; errEl.classList.add('show'); }
+      btn.disabled = false; btn.textContent = 'Verify email';
+    }
+  } catch(e) {
+    if (errEl) { errEl.textContent = 'Connection error — try again'; errEl.classList.add('show'); }
+    btn.disabled = false; btn.textContent = 'Verify email';
+  }
+}
+
+async function doResendCode() {
+  const link = document.getElementById('resend-link');
+  if (link) { link.style.opacity = '0.5'; link.style.pointerEvents = 'none'; }
+  try {
+    const res = await apiAuth({action:'resendCode', userId:_userId});
+    if (res.success) {
+      toast('New code sent to your email');
+    } else {
+      toast('Could not resend — ' + (res.error || 'try again'));
+    }
+  } catch(e) {
+    toast('Connection error — try again');
+  }
+  setTimeout(() => {
+    if (link) { link.style.opacity = '1'; link.style.pointerEvents = 'auto'; }
+  }, 10000);
 }
 
 function showAuthError(screen, msg) {
@@ -721,9 +804,65 @@ async function doSaveProfile() {
       });
       sessionStorage.setItem('spark_profile', JSON.stringify(_userProfile));
       showApp();
-      loadAll().then(() => showPage('dashboard'));
+      loadAll().then(() => showPlanSelection());
     } else { btn.disabled = false; btn.textContent = 'Finish setup ->'; alert(res.error || 'Could not save profile'); }
   } catch(e) { btn.disabled = false; btn.textContent = 'Finish setup ->'; alert('Connection error -- try again'); }
+}
+
+function showPlanSelection() {
+  const pc = document.getElementById('page-content');
+  const titles = document.getElementById('topbar-title');
+  const sub = document.getElementById('topbar-sub');
+  if (titles) titles.textContent = 'Choose Your Plan';
+  if (sub) sub.textContent = 'Start for free or unlock the full power of Spark';
+  if (!pc) return;
+  pc.innerHTML = `
+    <div style="max-width:800px;margin:0 auto;padding:20px 0">
+      <div style="text-align:center;margin-bottom:32px">
+        <div style="font-size:24px;font-weight:700;letter-spacing:-.3px;margin-bottom:8px">Choose your plan</div>
+        <div style="font-size:14px;color:var(--text3)">You can upgrade anytime from within Spark</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px">
+        <div style="border:2px solid var(--border);border-radius:var(--radius);padding:28px;background:var(--surface)">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:10px">Starter</div>
+          <div style="font-size:36px;font-weight:700;letter-spacing:-1px;margin-bottom:4px">Free</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:20px">no credit card needed</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:8px;display:flex;gap:8px;align-items:center"><span style="color:var(--accent);font-weight:700">✓</span>Up to 15 companies</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:8px;display:flex;gap:8px;align-items:center"><span style="color:var(--accent);font-weight:700">✓</span>Up to 20 prospects</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:8px;display:flex;gap:8px;align-items:center"><span style="color:var(--accent);font-weight:700">✓</span>Message drafting</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:8px;display:flex;gap:8px;align-items:center"><span style="color:var(--accent);font-weight:700">✓</span>Pipeline tracker</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:24px;display:flex;gap:8px;align-items:center"><span style="color:var(--accent);font-weight:700">✓</span>Activity report</div>
+          <button onclick="showPage('dashboard')" style="width:100%;padding:10px;background:var(--surface2);color:var(--text);border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);">Continue for free</button>
+        </div>
+        <div style="border:2px solid var(--accent);border-radius:var(--radius);padding:28px;background:var(--accent-light);position:relative">
+          <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--accent);color:white;font-size:11px;font-weight:700;padding:3px 12px;border-radius:20px;white-space:nowrap">MOST POPULAR</div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--accent);margin-bottom:10px">Professional</div>
+          <div style="font-size:36px;font-weight:700;letter-spacing:-1px;margin-bottom:4px">$79</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:20px">per month</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:8px;display:flex;gap:8px;align-items:center"><span style="color:var(--accent);font-weight:700">✓</span>Up to 100 companies</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:8px;display:flex;gap:8px;align-items:center"><span style="color:var(--accent);font-weight:700">✓</span>Up to 300 prospects</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:8px;display:flex;gap:8px;align-items:center"><span style="color:var(--accent);font-weight:700">✓</span>Full message drafting suite</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:8px;display:flex;gap:8px;align-items:center"><span style="color:var(--accent);font-weight:700">✓</span>Advanced analytics</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:8px;display:flex;gap:8px;align-items:center"><span style="color:var(--accent);font-weight:700">✓</span>Excel export</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:24px;display:flex;gap:8px;align-items:center"><span style="color:var(--accent);font-weight:700">✓</span>Priority support</div>
+          <button onclick="startCheckout('pro')" style="width:100%;padding:10px;background:var(--accent);color:white;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);">Get started — $79/mo</button>
+        </div>
+        <div style="border:2px solid var(--border);border-radius:var(--radius);padding:28px;background:var(--surface)">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:10px">Team</div>
+          <div style="font-size:36px;font-weight:700;letter-spacing:-1px;margin-bottom:4px">$159</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:20px">per month</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:8px;display:flex;gap:8px;align-items:center"><span style="color:var(--accent);font-weight:700">✓</span>Up to 300 companies</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:8px;display:flex;gap:8px;align-items:center"><span style="color:var(--accent);font-weight:700">✓</span>Up to 1,000 prospects</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:8px;display:flex;gap:8px;align-items:center"><span style="color:var(--accent);font-weight:700">✓</span>Up to 5 users</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:8px;display:flex;gap:8px;align-items:center"><span style="color:var(--accent);font-weight:700">✓</span>Team analytics</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:8px;display:flex;gap:8px;align-items:center"><span style="color:var(--accent);font-weight:700">✓</span>Dedicated onboarding</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:24px;display:flex;gap:8px;align-items:center"><span style="color:var(--accent);font-weight:700">✓</span>Priority support</div>
+          <button onclick="startCheckout('team')" style="width:100%;padding:10px;background:var(--surface);color:var(--accent);border:1.5px solid var(--accent);border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);">Get started — $159/mo</button>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:20px;font-size:12px;color:var(--text3)">Secure payment via Paddle · Cancel anytime</div>
+    </div>
+  `;
 }
 
 function doLogout() {
@@ -739,8 +878,10 @@ document.addEventListener('keydown', function(e) {
   if (e.key !== 'Enter') return;
   const loginScreen = document.getElementById('login-screen');
   const signupScreen = document.getElementById('signup-screen');
+  const verifyScreen = document.getElementById('verify-screen');
   if (loginScreen && loginScreen.classList.contains('active')) doLogin();
   else if (signupScreen && signupScreen.classList.contains('active')) doSignup();
+  else if (verifyScreen && verifyScreen.classList.contains('active')) doVerifyEmail();
 });
 
 (function init() {
