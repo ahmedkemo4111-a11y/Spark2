@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Spark -- SAP Outreach Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <style>
 :root {
   --bg:#f5f4f0;--surface:#fff;--surface2:#f0efe9;--border:#e2e0d8;
@@ -173,7 +174,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .upload-result.success{background:var(--green-light);color:var(--green)}
 .upload-result.error{background:var(--red-light);color:var(--red)}
 .upload-result.loading{background:var(--accent-light);color:var(--accent)}
-/* Upload progress steps */
 .upload-steps{margin-top:10px;display:flex;flex-direction:column;gap:6px}
 .upload-step{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text3)}
 .upload-step.active{color:var(--accent);font-weight:500}
@@ -248,6 +248,31 @@ body.dark{--bg:#111110;--surface:#1c1c1a;--surface2:#252523;--border:#2e2e2b;--t
 .onb-opt{padding:7px 14px;border:1px solid var(--border);border-radius:20px;font-size:13px;cursor:pointer;background:var(--bg);color:var(--text2);transition:all 0.2s;user-select:none;}
 .onb-opt:hover{border-color:var(--accent);color:var(--accent);}
 .onb-opt.sel{background:var(--accent);border-color:var(--accent);color:white;}
+
+/* UPGRADE MODAL */
+.upgrade-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:2000;align-items:center;justify-content:center;}
+.upgrade-modal-overlay.open{display:flex;}
+.upgrade-modal{background:var(--surface);border-radius:var(--radius);padding:32px;width:100%;max-width:620px;box-shadow:0 20px 60px rgba(0,0,0,0.2);position:relative;max-height:90vh;overflow-y:auto;}
+.upgrade-modal-close{position:absolute;top:16px;right:16px;background:none;border:none;cursor:pointer;color:var(--text3);font-size:20px;line-height:1;padding:4px 8px;border-radius:var(--radius-sm);}
+.upgrade-modal-close:hover{background:var(--surface2);}
+.upgrade-modal h2{font-size:22px;font-weight:700;margin-bottom:6px;letter-spacing:-.3px;}
+.upgrade-modal-sub{font-size:14px;color:var(--text3);margin-bottom:24px;}
+.upgrade-plans{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+.upgrade-plan{border:2px solid var(--border);border-radius:var(--radius);padding:24px;transition:all .2s;position:relative;}
+.upgrade-plan.featured{border-color:var(--accent);background:var(--accent-light);}
+.upgrade-plan-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:8px;}
+.upgrade-plan.featured .upgrade-plan-name{color:var(--accent);}
+.upgrade-plan-price{font-size:36px;font-weight:700;letter-spacing:-1px;margin-bottom:4px;}
+.upgrade-plan-period{font-size:12px;color:var(--text3);margin-bottom:16px;}
+.upgrade-plan-feature{font-size:13px;color:var(--text2);margin-bottom:7px;display:flex;align-items:center;gap:7px;}
+.upgrade-plan-feature::before{content:'✓';color:var(--accent);font-weight:700;flex-shrink:0;}
+.upgrade-plan-btn{width:100%;padding:10px;background:var(--accent);color:white;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;margin-top:16px;font-family:var(--font);transition:opacity .2s;}
+.upgrade-plan-btn:hover{opacity:.9;}
+.upgrade-plan-btn.outline{background:transparent;color:var(--accent);border:1.5px solid var(--accent);}
+.upgrade-plan-btn.outline:hover{background:var(--accent);color:white;}
+.upgrade-limit-banner{background:var(--orange-light);border:1px solid var(--orange);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.upgrade-limit-banner-text{font-size:13px;color:var(--orange);font-weight:500;}
+.upgrade-limit-banner-btn{background:var(--orange);color:white;border:none;border-radius:var(--radius-sm);padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:var(--font);}
 </style>
 </head>
 <body>
@@ -395,6 +420,42 @@ body.dark{--bg:#111110;--surface:#1c1c1a;--surface2:#252523;--border:#2e2e2b;--t
   </div>
 </div>
 
+<!-- UPGRADE MODAL -->
+<div class="upgrade-modal-overlay" id="upgrade-modal-overlay" onclick="closeUpgradeModal(event)">
+  <div class="upgrade-modal">
+    <button class="upgrade-modal-close" onclick="closeUpgradeModal()">✕</button>
+    <h2>Upgrade Spark</h2>
+    <div class="upgrade-modal-sub" id="upgrade-modal-sub">Unlock more companies, prospects, and features.</div>
+    <div class="upgrade-plans">
+      <div class="upgrade-plan featured">
+        <div class="upgrade-plan-name">Professional</div>
+        <div class="upgrade-plan-price">$79</div>
+        <div class="upgrade-plan-period">per month · 14-day free trial</div>
+        <div class="upgrade-plan-feature">Up to 100 companies</div>
+        <div class="upgrade-plan-feature">Up to 300 prospects</div>
+        <div class="upgrade-plan-feature">Full message drafting suite</div>
+        <div class="upgrade-plan-feature">Advanced analytics</div>
+        <div class="upgrade-plan-feature">Excel export</div>
+        <div class="upgrade-plan-feature">Priority support</div>
+        <button class="upgrade-plan-btn" onclick="startCheckout('pro')">Start free trial</button>
+      </div>
+      <div class="upgrade-plan">
+        <div class="upgrade-plan-name">Team</div>
+        <div class="upgrade-plan-price">$159</div>
+        <div class="upgrade-plan-period">per month · 14-day free trial</div>
+        <div class="upgrade-plan-feature">Up to 300 companies</div>
+        <div class="upgrade-plan-feature">Up to 1,000 prospects</div>
+        <div class="upgrade-plan-feature">Up to 5 users</div>
+        <div class="upgrade-plan-feature">Team analytics</div>
+        <div class="upgrade-plan-feature">Dedicated onboarding</div>
+        <div class="upgrade-plan-feature">Priority support</div>
+        <button class="upgrade-plan-btn outline" onclick="startCheckout('team')">Start free trial</button>
+      </div>
+    </div>
+    <div style="text-align:center;font-size:12px;color:var(--text3)">No credit card charged during trial &middot; Cancel anytime</div>
+  </div>
+</div>
+
 <aside class="sidebar">
   <div class="sidebar-logo">
     <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
@@ -424,6 +485,12 @@ body.dark{--bg:#111110;--surface:#1c1c1a;--surface2:#252523;--border:#2e2e2b;--t
     <button class="theme-btn" onclick="toggleTheme()"><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
     <button class="theme-btn" title="Logout" onclick="doLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
   </div>
+  <div style="padding:8px 12px 12px">
+    <button onclick="openUpgradeModal()" style="width:100%;padding:9px;background:var(--accent);color:white;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:6px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Upgrade Plan
+    </button>
+  </div>
 </aside>
 
 <main class="main">
@@ -442,10 +509,90 @@ body.dark{--bg:#111110;--surface:#1c1c1a;--surface2:#252523;--border:#2e2e2b;--t
 const API = 'https://script.google.com/macros/s/AKfycbwJXd8VS9F_NVSxuhva6JqJ398q9Jk9O419uitKAQW6yDkNcCAJkdJk4BKEKqg-aUQc-Q/exec';
 const IMGBB = '78d076b6b3ce492b51f2219de8166a29';
 
+// Paddle config
+const PADDLE_CLIENT_TOKEN = 'live_fd761caa666caae19d872f7132d';
+const PADDLE_PRO_PRICE    = 'pri_01krsd0ek91jdbk2vrstkgy0jd';
+const PADDLE_TEAM_PRICE   = 'pri_01krsd7nv6jqc0vmvjsn6p0r3k';
+
 let _userId = sessionStorage.getItem('spark_uid') || '';
 let _userProfile = JSON.parse(sessionStorage.getItem('spark_profile') || 'null');
 const _onbState = {services:'', accelerators:'', valueprop:'', saponly:'', licensing:'', approach:'', tone:''};
 
+// Init Paddle
+Paddle.Initialize({
+  token: PADDLE_CLIENT_TOKEN,
+  eventCallback: function(data) {
+    if (data.name === 'checkout.completed') {
+      toast('Payment successful! Your plan is being upgraded...');
+      closeUpgradeModal();
+      setTimeout(() => {
+        loadAll().then(() => {
+          showPage(currentPage);
+          const plan = _D?.planInfo?.plan || 'pro';
+          const planEl = document.getElementById('sidebar-plan');
+          if (planEl) planEl.textContent = plan + ' plan';
+        });
+      }, 3000);
+    }
+  }
+});
+
+// ============================================================
+// UPGRADE MODAL
+// ============================================================
+function openUpgradeModal(msg) {
+  const sub = document.getElementById('upgrade-modal-sub');
+  if (sub) sub.textContent = msg || 'Unlock more companies, prospects, and features.';
+  document.getElementById('upgrade-modal-overlay').classList.add('open');
+}
+
+function closeUpgradeModal(e) {
+  if (e && e.target !== document.getElementById('upgrade-modal-overlay')) return;
+  document.getElementById('upgrade-modal-overlay').classList.remove('open');
+}
+
+function startCheckout(plan) {
+  const priceId = plan === 'pro' ? PADDLE_PRO_PRICE : PADDLE_TEAM_PRICE;
+  const userEmail = sessionStorage.getItem('spark_email') || '';
+  Paddle.Checkout.open({
+    items: [{ priceId: priceId, quantity: 1 }],
+    customer: userEmail ? { email: userEmail } : undefined,
+    customData: { userId: _userId }
+  });
+}
+
+function checkPlanLimits() {
+  if (!_D?.planInfo) return;
+  const info = _D.planInfo;
+  const plan = info.plan || 'trial';
+  if (plan === 'pro' || plan === 'team') return;
+  const usage = info.usage || {};
+  const limits = info.limits || {};
+  const coUsed = usage.companies || 0;
+  const prUsed = usage.prospects || 0;
+  const coLimit = limits.companies || 15;
+  const prLimit = limits.prospects || 30;
+  const coWarn = coUsed >= Math.floor(coLimit * 0.8);
+  const prWarn = prUsed >= Math.floor(prLimit * 0.8);
+  if (!coWarn && !prWarn) return;
+  const content = document.getElementById('page-content');
+  if (!content || content.querySelector('.upgrade-limit-banner')) return;
+  let msg = '';
+  if (coUsed >= coLimit && prUsed >= prLimit) msg = 'You\'ve reached your free plan limits (' + coLimit + ' companies, ' + prLimit + ' prospects). Upgrade to continue.';
+  else if (coUsed >= coLimit) msg = 'Company limit reached (' + coUsed + '/' + coLimit + '). Upgrade to add more companies.';
+  else if (prUsed >= prLimit) msg = 'Prospect limit reached (' + prUsed + '/' + prLimit + '). Upgrade to add more prospects.';
+  else if (coWarn) msg = 'You\'re using ' + coUsed + ' of ' + coLimit + ' companies on your free plan.';
+  else msg = 'You\'re using ' + prUsed + ' of ' + prLimit + ' prospects on your free plan.';
+  const banner = document.createElement('div');
+  banner.className = 'upgrade-limit-banner';
+  banner.innerHTML = '<div class="upgrade-limit-banner-text">' + msg + '</div>'
+    + '<button class="upgrade-limit-banner-btn" onclick="openUpgradeModal()">Upgrade</button>';
+  content.insertBefore(banner, content.firstChild);
+}
+
+// ============================================================
+// AUTH
+// ============================================================
 function apiAuth(params) {
   const url = API + '?' + Object.entries(params).map(([k,v]) => k + '=' + encodeURIComponent(v)).join('&');
   return fetch(url).then(r => r.json());
@@ -483,9 +630,10 @@ async function doLogin() {
     if (res.success) {
       _userId = res.userId;
       _userProfile = res;
-      _D = null; _CC = {}; // clear any previous user's cached data
+      _D = null; _CC = {};
       sessionStorage.setItem('spark_uid', _userId);
       sessionStorage.setItem('spark_profile', JSON.stringify(res));
+      sessionStorage.setItem('spark_email', res.email || email); // store email for Paddle
       if (res.needsOnboarding) { showScreen('onboarding'); }
       else { showApp(); loadAll().then(() => showPage('dashboard')); }
     } else { showAuthError('login', res.error || 'Invalid email or password'); }
@@ -508,6 +656,7 @@ async function doSignup() {
       _userProfile = {userId:res.userId, companyName:company, email, plan:'trial'};
       sessionStorage.setItem('spark_uid', _userId);
       sessionStorage.setItem('spark_profile', JSON.stringify(_userProfile));
+      sessionStorage.setItem('spark_email', email);
       showScreen('onboarding');
     } else { showAuthError('signup', res.error || 'Could not create account'); }
   } catch(e) { showAuthError('signup', 'Connection error -- try again'); }
@@ -568,8 +717,9 @@ async function doSaveProfile() {
 function doLogout() {
   sessionStorage.removeItem('spark_uid');
   sessionStorage.removeItem('spark_profile');
+  sessionStorage.removeItem('spark_email');
   _userId = ''; _userProfile = null;
-  _D = null; _CC = {}; // clear all cached data so next user sees nothing stale
+  _D = null; _CC = {};
   showScreen('login');
 }
 
@@ -596,11 +746,10 @@ function apiRaw(params){
   const url=API+'?'+Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
   return fetch(url).then(r=>r.json());
 }
-let _stale = false; // marks data as needing refresh on next page nav
+let _stale = false;
 
 function loadAll(){return apiRaw({action:'all'}).then(data=>{_D=data;_stale=false;_CC={};return data;});}
 
-// apiWrite: fire and forget — mark stale, don't block on reload
 function apiWrite(params){
   const result=apiRaw(params);
   result.then(()=>{_stale=true;}).catch(()=>{});
@@ -646,9 +795,10 @@ function showPage(page,extra){
   if(page==='upload'){loadUpload();return;}
   document.getElementById('page-content').innerHTML=skeletonCards(page==='dashboard'?2:4);
   if(_stale||!_D){
-    loadAll().then(()=>renderPage(page,extra));
+    loadAll().then(()=>{renderPage(page,extra);setTimeout(checkPlanLimits,100);});
   } else {
     renderPage(page,extra);
+    setTimeout(checkPlanLimits,100);
   }
 }
 function renderPage(page,extra){
@@ -1146,7 +1296,7 @@ function renderActivity(){
   document.getElementById('page-content').innerHTML=html;
 }
 
-// UPLOAD — improved with step-by-step progress
+// UPLOAD
 function loadUpload(){
   document.getElementById('page-content').innerHTML='<div class="upload-grid">'
     +'<div><div style="font-size:15px;font-weight:600;margin-bottom:12px">Company Screenshot</div>'
@@ -1175,7 +1325,6 @@ function uploadFile(file,resultId,type){
   const el=document.getElementById(resultId);
   const isProspect=type==='prospect';
 
-  // Show step-by-step progress
   el.innerHTML='<div class="upload-result loading">'
     +'<div style="font-weight:600;margin-bottom:8px">Processing... please wait (30-90 sec)</div>'
     +'<div class="upload-steps">'
@@ -1215,7 +1364,13 @@ function uploadFile(file,resultId,type){
             +'</div>';
           toast('Upload successful');
           loadAll().catch(()=>{});
-        }else{
+        } else if(res.error==='LIMIT_REACHED') {
+          el.innerHTML='<div class="upload-result error">'
+            +'<div style="font-weight:600;margin-bottom:4px">Plan limit reached</div>'
+            +'<div style="font-size:12px">'+(res.message||'Upgrade to add more.')+'</div>'
+            +'</div>';
+          openUpgradeModal(res.message||'Upgrade to add more.');
+        } else {
           el.innerHTML='<div class="upload-result error">'
             +'<div style="font-weight:600;margin-bottom:4px">Upload failed</div>'
             +'<div style="font-size:12px">'+(res.error||'Unknown error')+'</div>'
