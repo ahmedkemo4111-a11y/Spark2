@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google-site-verification" content="OWGooCkGOGAiWQW5cGQvxRbrhg-G1xYJ86sRixQwxLE" />
 
 <!-- Primary SEO -->
 <title>Spark — CRM & Outreach Tool for SAP Consultants | Book More Meetings</title>
@@ -217,7 +218,6 @@
 
   .section-sub { font-size: 16px; color: var(--muted); max-width: 500px; line-height: 1.7; }
 
-  /* WHAT */
   .what-grid {
     display: grid; grid-template-columns: 1fr 1fr;
     gap: 64px; align-items: center; margin-top: 56px;
@@ -255,7 +255,6 @@
   .badge-yellow { background: #fef3c7; color: #92400e; }
   .badge-blue { background: #dbeafe; color: #1e40af; }
 
-  /* FEATURES */
   .features-section { background: var(--card); }
 
   .features-grid {
@@ -278,7 +277,6 @@
   .feature-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
   .feature-card p { font-size: 14px; color: var(--muted); line-height: 1.7; }
 
-  /* PRICING */
   .pricing-section { background: var(--ink); color: white; }
   .pricing-section .section-title { color: white; max-width: 100%; margin: 0 auto; }
   .pricing-section .section-label { color: #a78bfa; }
@@ -314,15 +312,9 @@
 
   .pricing-note { font-size: 13px; color: rgba(255,255,255,0.35); margin-top: 40px; text-align: center; }
 
-  /* FAQ */
   .faq-section { background: var(--paper); }
-
   .faq-list { margin-top: 52px; max-width: 720px; }
-
-  .faq-item {
-    border-bottom: 1px solid var(--border);
-    padding: 24px 0;
-  }
+  .faq-item { border-bottom: 1px solid var(--border); padding: 24px 0; }
 
   .faq-question {
     font-size: 16px; font-weight: 600; cursor: pointer;
@@ -346,7 +338,6 @@
 
   .faq-item.open .faq-answer { max-height: 300px; padding-top: 14px; }
 
-  /* CTA */
   .cta-band { background: var(--spark); color: white; text-align: center; padding: 88px 24px; }
   .cta-band h2 { font-size: clamp(26px, 3vw, 42px); font-weight: 700; margin-bottom: 14px; letter-spacing: -0.02em; }
   .cta-band p { font-size: 17px; opacity: 0.85; margin-bottom: 32px; }
@@ -354,7 +345,6 @@
   .btn-white { background: white; color: var(--spark); padding: 13px 32px; font-size: 15px; }
   .btn-white:hover { background: #f5f3ff; box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
 
-  /* FOOTER */
   footer {
     background: #0d1117; color: rgba(255,255,255,0.45);
     padding: 40px 24px; text-align: center; font-size: 13px;
@@ -369,7 +359,6 @@
   .footer-links a { color: rgba(255,255,255,0.45); text-decoration: none; transition: color .2s; }
   .footer-links a:hover { color: white; }
 
-  /* LEGAL */
   .page { display: none; }
   .page.active { display: block; }
 
@@ -392,7 +381,7 @@
     .nav-links { display: none; }
     .what-grid { grid-template-columns: 1fr; gap: 32px; }
     .features-grid { grid-template-columns: 1fr; }
-    .pricing-box { padding: 28px 24px; }
+    .pricing-cards { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -432,7 +421,6 @@
     </div>
   </div>
 
-  <!-- WHAT IS SPARK -->
   <section id="what">
     <div class="container">
       <div class="what-grid">
@@ -474,7 +462,6 @@
     </div>
   </section>
 
-  <!-- FEATURES -->
   <section id="features" class="features-section">
     <div class="container">
       <div class="section-label">Features</div>
@@ -515,13 +502,11 @@
     </div>
   </section>
 
-  <!-- FAQ -->
   <section id="faq" class="faq-section">
     <div class="container">
       <div class="section-label">FAQ</div>
       <h2 class="section-title">Common questions</h2>
       <div class="faq-list">
-
         <div class="faq-item">
           <div class="faq-question" onclick="toggleFaq(this)">
             Who is Spark for?
@@ -529,7 +514,6 @@
           </div>
           <div class="faq-answer">Spark is built for SAP consultants and SAP partner firms who need to run structured outreach to potential clients. If you're managing a list of prospects and sending personalized messages to book meetings, Spark is designed for you.</div>
         </div>
-
         <div class="faq-item">
           <div class="faq-question" onclick="toggleFaq(this)">
             Is my data private? Can other users see my prospects?
@@ -537,7 +521,6 @@
           </div>
           <div class="faq-answer">Yes, completely. Each Spark account is fully isolated. Your prospects, messages, and activity are only visible to you when you're logged in. No other user can access your data.</div>
         </div>
-
         <div class="faq-item">
           <div class="faq-question" onclick="toggleFaq(this)">
             Does Spark send messages automatically?
@@ -545,7 +528,6 @@
           </div>
           <div class="faq-answer">No. Spark helps you draft and organize your messages, but you always send them yourself through your own channels (phone, LinkedIn, email). Spark is a drafting and tracking tool, not an automation tool.</div>
         </div>
-
         <div class="faq-item">
           <div class="faq-question" onclick="toggleFaq(this)">
             What does the onboarding profile do?
@@ -553,7 +535,6 @@
           </div>
           <div class="faq-answer">When you sign up, Spark asks you a few questions about your company — what services you offer, your value proposition, your preferred tone, and your approach to outreach. This profile is then used to personalize every message draft Spark generates for you.</div>
         </div>
-
         <div class="faq-item">
           <div class="faq-question" onclick="toggleFaq(this)">
             Is Spark free to use?
@@ -561,7 +542,6 @@
           </div>
           <div class="faq-answer">Spark has a free plan that includes 15 companies and 20 prospects — no credit card required. When you need more, you can upgrade to a paid plan directly from within the app.</div>
         </div>
-
         <div class="faq-item">
           <div class="faq-question" onclick="toggleFaq(this)">
             What information do I need to get started?
@@ -569,12 +549,10 @@
           </div>
           <div class="faq-answer">Just your email and a password to create an account. Then a quick 5-step onboarding to set up your company profile. The whole setup takes under 5 minutes.</div>
         </div>
-
       </div>
     </div>
   </section>
 
-  <!-- PRICING -->
   <section id="pricing" class="pricing-section">
     <div class="container">
       <div class="section-label">Pricing</div>
@@ -617,7 +595,6 @@
     </div>
   </section>
 
-  <!-- CTA -->
   <div class="cta-band">
     <h2>Ready to book more meetings with SAP prospects?</h2>
     <p>Join SAP consultants and partner sales teams already using Spark to win more deals.</p>
@@ -641,7 +618,7 @@
     <p>© 2026 Spark. All rights reserved. Built by Ahmed Kamel.</p>
   </footer>
 
-</div><!-- end page-home -->
+</div>
 
 <!-- TERMS -->
 <div id="page-terms" class="page">
@@ -684,7 +661,7 @@
     <h2>6. Message Drafting</h2>
     <p>The Service provides tools to help you draft outreach messages. You are solely responsible for reviewing messages before sending them to prospects and for compliance with applicable communications laws.</p>
     <h2>7. Payment and Subscriptions</h2>
-    <p>Certain features may require a paid subscription in the future. Pricing will be communicated in advance with 30 days' notice before any changes.</p>
+    <p>Certain features may require a paid subscription. Pricing will be communicated in advance with 30 days' notice before any changes.</p>
     <h2>8. Intellectual Property</h2>
     <p>The Service and its design are owned by Ahmed Kamel and protected by intellectual property laws.</p>
     <h2>9. Disclaimer of Warranties</h2>
